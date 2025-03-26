@@ -19,6 +19,15 @@ void File_init(File* file, const char* filename) {
 
     file->content = (char*)malloc(file->length + 1);
 
+    // Verifica si se pudo reservar memoria
+    if (file->content == NULL) {
+        fprintf(stderr, "Error: No se puede reservar memoria para el archivo '%s'\n", filename);
+        File_free(file);
+        fclose(fp);
+
+        return;
+    }
+
     fread(file->content, 1, file->length, fp);
     file->content[file->length] = '\0';
 
