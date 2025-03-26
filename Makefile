@@ -4,16 +4,10 @@ ifeq ($(OS), Windows_NT)
         CLEANUP = del /F /Q
         MKDIR = mkdir
         ECHO = echo
-        FIND_PASS = findstr /C:"PASS"
-        FIND_FAIL = findstr /C:"FAIL"
-        FIND_IGNORE = findstr /C:"IGNORE"
     else
         CLEANUP = rm -f
         MKDIR = mkdir -p
         ECHO = echo -e
-        FIND_PASS = grep "PASS"
-        FIND_FAIL = grep "FAIL"
-        FIND_IGNORE = grep "IGNORE"
     endif
 
     TARGET_EXTENSION = .exe
@@ -21,9 +15,6 @@ else
     CLEANUP = rm -f
     MKDIR = mkdir -p
     ECHO = echo -e
-    FIND_PASS = grep "PASS"
-    FIND_FAIL = grep "FAIL"
-    FIND_IGNORE = grep "IGNORE"
     TARGET_EXTENSION = .out
 endif
 
