@@ -8,7 +8,5 @@ int main(void) {
     RUN_TEST(test_File_init_with_valid_file);
     RUN_TEST(test_File_free);
     
-    UNITY_END();
-
-    return 0;
+    return UNITY_END();
 }

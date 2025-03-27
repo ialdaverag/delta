@@ -1,6 +1,7 @@
 #include "file.h"
 
 void File_init(File* file, const char* filename) {
+    // Inicializa la estructura
     file->filename = strdup(filename);
 
     // Intenta abrir el archivo
@@ -12,6 +13,7 @@ void File_init(File* file, const char* filename) {
         return;
     }
 
+    // Obtiene la longitud del archivo
     fseek(fp, 0, SEEK_END);
     file->length = ftell(fp);
     fseek(fp, 0, SEEK_SET);
@@ -32,25 +34,30 @@ void File_init(File* file, const char* filename) {
         fprintf(stderr, "Error: Unable to read file '%s'. %s\n", filename, strerror(errno));
         free(file->content);
         fclose(fp);
-        
+
         return;
     }
 
+    // Agrega el caracter nulo al final del contenido
     file->content[file->length] = '\0';
 
+    // Cierra el archivo
     fclose(fp);
 }
 
 void File_free(File* file) {
+    // Libera la memoria reservada para el nombre del archivo
     if (file->filename != NULL) {
         free(file->filename);
         file->filename = NULL;
     }
 
+    // Libera la memoria reservada para el contenido del archivo
     if (file->content != NULL) {
         free(file->content);
         file->content = NULL;
     }
 
+    // Establece la longitud del archivo en 0
     file->length = 0;
 }
