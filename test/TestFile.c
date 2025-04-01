@@ -1,9 +1,5 @@
 #include "TestFile.h"
 
-void setUp() {}
-
-void tearDown() {}
-
 void test_File_init_with_valid_file() {
     File file;
     const char* test_file = "test_valid.delta";
