@@ -1,5 +1,5 @@
 #include "file.h"
-#include "token.h"
+#include "lexer.h"
 
 int main(int argc, const char* argv[]) {
     if (argc < 2) {
@@ -29,6 +29,8 @@ int main(int argc, const char* argv[]) {
     printf("Longitud del token: %d\n", token.length);
     printf("Linea del token: %d\n", token.line);
 
+    Lexer lexer;
+    Lexer_init(&lexer, file.content);
     
     File_free(&file);
 

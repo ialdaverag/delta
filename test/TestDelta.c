@@ -1,6 +1,7 @@
 #include "unity.h"
 #include "TestFile.h"
 #include "TestToken.h"
+#include "TestLexer.h"
 
 void setUp(void) {
     // Configuración antes de cada prueba
@@ -19,6 +20,9 @@ int main(void) {
 
     // Tests para token.c
     RUN_TEST(test_Token_init);
+
+    // Tests para lexer.c
+    RUN_TEST(test_Lexer_init);
 
     return UNITY_END();
 }

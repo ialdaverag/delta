@@ -81,6 +81,6 @@ $(TARGET): $(OBJS)
 	@$(ECHO) "\n\xF0\x9F\x94\x97 Enlazando programa principal"
 	$(CC) $(LINK_FLAGS) $^ -o $@
 
-$(TEST_RUNNER): $(PATHO)TestDelta.o $(PATHO)TestFile.o $(PATHO)TestToken.o $(PATHO)unity.o $(filter-out $(PATHO)delta.o,$(OBJS))
+$(TEST_RUNNER): $(PATHO)TestDelta.o $(PATHO)TestFile.o $(PATHO)TestToken.o $(PATHO)TestLexer.o $(PATHO)unity.o $(filter-out $(PATHO)delta.o,$(OBJS))
 	@$(ECHO) "\n\xF0\x9F\x94\x97 Enlazando test runner"
 	$(CC) $(LINK_FLAGS) $^ -o $@
