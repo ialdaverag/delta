@@ -24,6 +24,7 @@ int main(void) {
     // Tests para lexer.c
     RUN_TEST(test_Lexer_init);
     RUN_TEST(test_Lexer_token_fda);
+    RUN_TEST(test_Lexer_ignore_whitespace);
 
     return UNITY_END();
 }

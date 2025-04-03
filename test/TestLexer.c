@@ -18,3 +18,11 @@ void test_Lexer_token_fda(void) {
     Token token = Lexer_next_token(&lexer);
     TEST_ASSERT_EQUAL_INT(TOKEN_FDA, token.type);
 }
+
+void test_Lexer_ignore_whitespace(void) {
+    Lexer lexer;
+    Lexer_init(&lexer, "   \t\n  ");
+
+    Token token = Lexer_next_token(&lexer);
+    TEST_ASSERT_EQUAL(TOKEN_FDA, token.type);
+}
