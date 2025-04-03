@@ -25,6 +25,7 @@ int main(void) {
     RUN_TEST(test_Lexer_init);
     RUN_TEST(test_Lexer_token_fda);
     RUN_TEST(test_Lexer_ignore_whitespace);
+    RUN_TEST(test_Lexer_unexpected_character);
 
     return UNITY_END();
 }
