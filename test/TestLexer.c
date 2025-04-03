@@ -58,3 +58,15 @@ void test_Lexer_operador_asignacion(void) {
     TEST_ASSERT_EQUAL(TOKEN_ASIGNACION, Lexer_next_token(&lexer).type);
     TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
 }
+
+void test_Lexer_operadores_aritmeticos(void) {
+    Lexer lexer;
+    Lexer_init(&lexer, "+-*/%");
+
+    TEST_ASSERT_EQUAL(TOKEN_MAS, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_MENOS, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_ASTERISCO, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_DIAGONAL, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_PORCENTAJE, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
+}

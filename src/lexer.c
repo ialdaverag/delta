@@ -40,6 +40,18 @@ static void skip_whitespace(Lexer* lexer) {
     }
 }
 
+static bool match(Lexer* lexer, char expected) {
+    if (is_at_end(lexer)) 
+        return false;
+
+    if (*lexer->current != expected) 
+        return false;
+
+    lexer->current++;
+    
+    return true;
+}
+
 static Token make_token(Lexer* lexer, TokenType type) {
     Token token;
     Token_init(&token, type, lexer->start, lexer->current, lexer->line);
@@ -87,7 +99,22 @@ Token Lexer_next_token(Lexer* lexer) {
 
         // Operador de asignación
         case '=':
+            if (match(lexer, '=')) 
+                return make_token(lexer, TOKEN_IGUAL);
+            
             return make_token(lexer, TOKEN_ASIGNACION);
+
+        // Operadores aritméticos
+        case '+':
+            return make_token(lexer, TOKEN_MAS);
+        case '-':
+            return make_token(lexer, TOKEN_MENOS);
+        case '*':
+            return make_token(lexer, TOKEN_ASTERISCO);
+        case '/':
+            return make_token(lexer, TOKEN_DIAGONAL);
+        case '%':
+            return make_token(lexer, TOKEN_PORCENTAJE);
     }
 
     return error_token(lexer, "Caracter inesperado.");
