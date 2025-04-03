@@ -62,5 +62,28 @@ Token Lexer_next_token(Lexer* lexer) {
     if (is_at_end(lexer)) 
         return make_token(lexer, TOKEN_FDA);
 
+    char c = advance(lexer);
+
+    switch (c) {
+        case '(':
+            return make_token(lexer, TOKEN_PARENTESIS_IZQUIERDO);
+        case ')':
+            return make_token(lexer, TOKEN_PARENTESIS_DERECHO);
+        case '[':
+            return make_token(lexer, TOKEN_CORCHETE_IZQUIERDO);
+        case ']':
+            return make_token(lexer, TOKEN_CORCHETE_DERECHO);
+        case '{':
+            return make_token(lexer, TOKEN_LLAVE_IZQUIERDA);
+        case '}':
+            return make_token(lexer, TOKEN_LLAVE_DERECHA);
+        case ',':
+            return make_token(lexer, TOKEN_COMA);
+        case '.':
+            return make_token(lexer, TOKEN_PUNTO);
+        case ':':
+            return make_token(lexer, TOKEN_DOS_PUNTOS);
+    }
+
     return error_token(lexer, "Caracter inesperado.");
 }
