@@ -31,6 +31,14 @@ int main(int argc, const char* argv[]) {
 
     Lexer lexer;
     Lexer_init(&lexer, file.content);
+
+    printf("\nTokens:\n");
+    for (;;) {
+        Token token = Lexer_next_token(&lexer);
+        printf("Token [L%d]: Type=%d, Length=%d, Text='%.*s'\n", token.line, token.type, token.length, token.length, token.start);
+        
+        if (token.type == TOKEN_FDA || token.type == TOKEN_ERROR) break;
+    }
     
     File_free(&file);
 

@@ -5,5 +5,6 @@
 #include "../src/lexer.h"
 
 void test_Lexer_init(void);
+void test_Lexer_token_fda(void);
 
 #endif // TEST_LEXER_H

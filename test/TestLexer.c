@@ -10,3 +10,11 @@ void test_Lexer_init() {
     TEST_ASSERT_EQUAL_STRING(source, lexer.current);
     TEST_ASSERT_EQUAL(1, lexer.line);
 }
+
+void test_Lexer_token_fda(void) {
+    Lexer lexer;
+    Lexer_init(&lexer, "");
+
+    Token token = Lexer_next_token(&lexer);
+    TEST_ASSERT_EQUAL_INT(TOKEN_FDA, token.type);
+}
