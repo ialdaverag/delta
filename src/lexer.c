@@ -65,6 +65,7 @@ Token Lexer_next_token(Lexer* lexer) {
     char c = advance(lexer);
 
     switch (c) {
+        // Delimitadores
         case '(':
             return make_token(lexer, TOKEN_PARENTESIS_IZQUIERDO);
         case ')':
@@ -83,6 +84,10 @@ Token Lexer_next_token(Lexer* lexer) {
             return make_token(lexer, TOKEN_PUNTO);
         case ':':
             return make_token(lexer, TOKEN_DOS_PUNTOS);
+
+        // Operador de asignación
+        case '=':
+            return make_token(lexer, TOKEN_ASIGNACION);
     }
 
     return error_token(lexer, "Caracter inesperado.");

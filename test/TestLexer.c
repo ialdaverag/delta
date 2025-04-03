@@ -50,3 +50,11 @@ void test_Lexer_token_delimitadores(void) {
     TEST_ASSERT_EQUAL_INT(TOKEN_PUNTO, Lexer_next_token(&lexer).type);
     TEST_ASSERT_EQUAL_INT(TOKEN_DOS_PUNTOS, Lexer_next_token(&lexer).type);
 }
+
+void test_Lexer_operador_asignacion(void) {
+    Lexer lexer;
+    Lexer_init(&lexer, "=");
+
+    TEST_ASSERT_EQUAL(TOKEN_ASIGNACION, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
+}

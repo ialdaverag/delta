@@ -27,6 +27,7 @@ int main(void) {
     RUN_TEST(test_Lexer_ignore_whitespace);
     RUN_TEST(test_Lexer_unexpected_character);
     RUN_TEST(test_Lexer_token_delimitadores);
+    RUN_TEST(test_Lexer_operador_asignacion);
 
     return UNITY_END();
 }
