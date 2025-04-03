@@ -11,5 +11,6 @@ void test_Lexer_unexpected_character(void);
 void test_Lexer_token_delimitadores(void);
 void test_Lexer_operador_asignacion(void);
 void test_Lexer_operadores_aritmeticos(void);
+void test_Lexer_operadores_comparacion(void);
 
 #endif // TEST_LEXER_H

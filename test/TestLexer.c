@@ -70,3 +70,16 @@ void test_Lexer_operadores_aritmeticos(void) {
     TEST_ASSERT_EQUAL(TOKEN_PORCENTAJE, Lexer_next_token(&lexer).type);
     TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
 }
+
+void test_Lexer_operadores_comparacion(void) {
+    Lexer lexer;
+    Lexer_init(&lexer, "== != < <= > >=");
+
+    TEST_ASSERT_EQUAL(TOKEN_IGUAL, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_DISTINTO, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_MENOR, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_MENOR_IGUAL, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_MAYOR, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_MAYOR_IGUAL, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
+}

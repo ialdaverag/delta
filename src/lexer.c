@@ -115,6 +115,23 @@ Token Lexer_next_token(Lexer* lexer) {
             return make_token(lexer, TOKEN_DIAGONAL);
         case '%':
             return make_token(lexer, TOKEN_PORCENTAJE);
+
+        // Operadores de comparación
+        case '!':
+            if (match(lexer, '=')) 
+                return make_token(lexer, TOKEN_DISTINTO);
+
+            break;
+        case '<':
+            if (match(lexer, '=')) 
+                return make_token(lexer, TOKEN_MENOR_IGUAL);
+
+            return make_token(lexer, TOKEN_MENOR);
+        case '>':
+            if (match(lexer, '=')) 
+                return make_token(lexer, TOKEN_MAYOR_IGUAL);
+
+            return make_token(lexer, TOKEN_MAYOR);
     }
 
     return error_token(lexer, "Caracter inesperado.");

@@ -29,6 +29,7 @@ int main(void) {
     RUN_TEST(test_Lexer_token_delimitadores);
     RUN_TEST(test_Lexer_operador_asignacion);
     RUN_TEST(test_Lexer_operadores_aritmeticos);
+    RUN_TEST(test_Lexer_operadores_comparacion);
 
     return UNITY_END();
 }
