@@ -96,7 +96,19 @@ static Token error_token(Lexer* lexer, const char* message) {
     return token;
 }
 
+static TokenType check_keyword(Lexer* lexer, int start, int length, const char* rest, TokenType type) {
+    if (lexer->current - lexer->start == start + length && memcmp(lexer->start + start, rest, length) == 0)
+        return type;
+
+    return TOKEN_IDENTIFICADOR;
+}
+
 static TokenType identifier_type(Lexer* lexer) {
+    switch (lexer->start[0]) {
+        case 'v':
+            return check_keyword(lexer, 1, 2, "ar", TOKEN_VAR);
+    }
+    
     return TOKEN_IDENTIFICADOR;
 }
 

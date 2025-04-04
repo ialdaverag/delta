@@ -118,3 +118,25 @@ void test_Lexer_identificadores(void) {
     TEST_ASSERT_EQUAL(TOKEN_IDENTIFICADOR, Lexer_next_token(&lexer).type);
     TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
 }
+
+void test_lexer_keywords(void) {
+    struct {
+        const char* input;
+        TokenType esperado;
+    } casos[] = {
+        {"var", TOKEN_VAR},
+        {"variable", TOKEN_IDENTIFICADOR},  // no es keyword exacta
+        {"vara", TOKEN_IDENTIFICADOR},      // empieza igual pero no es igual
+        {"_var", TOKEN_IDENTIFICADOR},      // con guión bajo
+    };
+
+    for (int i = 0; i < sizeof(casos) / sizeof(casos[0]); i++) {
+        Lexer lexer;
+        Lexer_init(&lexer, casos[i].input);
+
+        Token token = Lexer_next_token(&lexer);
+
+        TEST_ASSERT_EQUAL(casos[i].esperado, token.type);
+        TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
+    }
+}

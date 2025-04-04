@@ -14,5 +14,6 @@ void test_Lexer_operadores_aritmeticos(void);
 void test_Lexer_operadores_comparacion(void);
 void test_Lexer_cadena(void);
 void test_Lexer_identificadores(void);
+void test_lexer_keywords(void);
 
 #endif // TEST_LEXER_H
