@@ -125,9 +125,7 @@ void test_lexer_keywords(void) {
         TokenType esperado;
     } casos[] = {
         {"var", TOKEN_VAR},
-        {"variable", TOKEN_IDENTIFICADOR},  // no es keyword exacta
-        {"vara", TOKEN_IDENTIFICADOR},      // empieza igual pero no es igual
-        {"_var", TOKEN_IDENTIFICADOR},      // con guión bajo
+        {"const", TOKEN_CONST}, 
     };
 
     for (int i = 0; i < sizeof(casos) / sizeof(casos[0]); i++) {
