@@ -17,7 +17,7 @@ void test_Lexer_unexpected_character(void) {
 
     Token token = Lexer_next_token(&lexer);
     TEST_ASSERT_EQUAL(TOKEN_ERROR, token.type);
-    TEST_ASSERT_EQUAL_STRING("Caracter inesperado.", token.start);
+    TEST_ASSERT_EQUAL_STRING("ERROR: Caracter inesperado.", token.start);
 }
 
 void test_Lexer_token_fda(void) {
@@ -82,4 +82,29 @@ void test_Lexer_operadores_comparacion(void) {
     TEST_ASSERT_EQUAL(TOKEN_MAYOR, Lexer_next_token(&lexer).type);
     TEST_ASSERT_EQUAL(TOKEN_MAYOR_IGUAL, Lexer_next_token(&lexer).type);
     TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
+}
+
+void test_Lexer_cadena(void) {
+    struct {
+        const char* input;
+        TokenType expected;
+    } casos[] = {
+        {"\"Hola mundo\"", TOKEN_LITERAL_CADENA},
+        {"\"Esto es una prueba\"", TOKEN_LITERAL_CADENA},
+        {"\"\"", TOKEN_LITERAL_CADENA},
+        {"\"Falta cierre", TOKEN_ERROR},
+        {"\"Primera línea \n Segunda línea\"", TOKEN_ERROR}
+    };
+
+    for (int i = 0; i < sizeof(casos) / sizeof(casos[0]); i++) {
+        Lexer lexer;
+        Lexer_init(&lexer, casos[i].input);
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(casos[i].expected, token.type);
+
+        if (token.type != TOKEN_ERROR) {
+            TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
+        }
+    }
 }

@@ -52,6 +52,26 @@ static bool match(Lexer* lexer, char expected) {
     return true;
 }
 
+static bool is_string(Lexer* lexer) {
+    while (peek(lexer) != '"' && !is_at_end(lexer)) {
+        if (peek(lexer) == '\n') {
+            advance(lexer);  // Consume el '\n' para no bloquear el lexer
+
+            return false;
+        }
+        
+        advance(lexer);
+    }
+
+    if (is_at_end(lexer)) {
+        return false;
+    }
+
+    advance(lexer);  // Consume la comilla de cierre
+
+    return true;
+}
+
 static Token make_token(Lexer* lexer, TokenType type) {
     Token token;
     Token_init(&token, type, lexer->start, lexer->current, lexer->line);
@@ -132,7 +152,14 @@ Token Lexer_next_token(Lexer* lexer) {
                 return make_token(lexer, TOKEN_MAYOR_IGUAL);
 
             return make_token(lexer, TOKEN_MAYOR);
+
+        // Cadena
+        case '"':
+            if (!is_string(lexer))
+                return error_token(lexer, "ERROR: Cadena no terminada.");
+            
+            return make_token(lexer, TOKEN_LITERAL_CADENA);
     }
 
-    return error_token(lexer, "Caracter inesperado.");
+    return error_token(lexer, "ERROR: Caracter inesperado.");
 }
