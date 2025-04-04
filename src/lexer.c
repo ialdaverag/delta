@@ -40,6 +40,16 @@ static void skip_whitespace(Lexer* lexer) {
     }
 }
 
+static bool is_alpha(char c) {
+    return (c >= 'a' && c <= 'z') || 
+           (c >= 'A' && c <= 'Z') || 
+            c == '_';
+}
+
+static bool is_digit(char c) {
+    return c >= '0' && c <= '9';
+}
+
 static bool match(Lexer* lexer, char expected) {
     if (is_at_end(lexer)) 
         return false;
@@ -59,7 +69,7 @@ static bool is_string(Lexer* lexer) {
 
             return false;
         }
-        
+
         advance(lexer);
     }
 
@@ -86,6 +96,17 @@ static Token error_token(Lexer* lexer, const char* message) {
     return token;
 }
 
+static TokenType identifier_type(Lexer* lexer) {
+    return TOKEN_IDENTIFICADOR;
+}
+
+static Token identifier(Lexer* lexer) {
+    while (is_alpha(peek(lexer)) || is_digit(peek(lexer)))
+        advance(lexer);
+    
+    return make_token(lexer, identifier_type(lexer));
+}
+
 Token Lexer_next_token(Lexer* lexer) {
     skip_whitespace(lexer);
 
@@ -95,6 +116,9 @@ Token Lexer_next_token(Lexer* lexer) {
         return make_token(lexer, TOKEN_FDA);
 
     char c = advance(lexer);
+
+    if (is_alpha(c)) 
+        return identifier(lexer);
 
     switch (c) {
         // Delimitadores

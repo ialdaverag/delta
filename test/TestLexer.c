@@ -108,3 +108,13 @@ void test_Lexer_cadena(void) {
         }
     }
 }
+
+void test_Lexer_identificadores(void) {
+    Lexer lexer;
+    Lexer_init(&lexer, "variable _variable otraVariable");
+
+    TEST_ASSERT_EQUAL(TOKEN_IDENTIFICADOR, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_IDENTIFICADOR, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_IDENTIFICADOR, Lexer_next_token(&lexer).type);
+    TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
+}

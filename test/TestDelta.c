@@ -31,6 +31,7 @@ int main(void) {
     RUN_TEST(test_Lexer_operadores_aritmeticos);
     RUN_TEST(test_Lexer_operadores_comparacion);
     RUN_TEST(test_Lexer_cadena);
+    RUN_TEST(test_Lexer_identificadores);
 
     return UNITY_END();
 }
