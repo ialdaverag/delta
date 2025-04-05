@@ -160,7 +160,15 @@ static TokenType identifier_type(Lexer* lexer) {
             }
             break;
         case 'v':
-            return check_keyword(lexer, 1, 2, "ar", TOKEN_VAR);
+            if (lexer->current - lexer->start > 1) {
+                switch (lexer->start[1]) {
+                    case 'a': 
+                        return check_keyword(lexer, 2, 1, "r", TOKEN_VAR);
+                    case 'e': 
+                        return check_keyword(lexer, 2, 7, "rdadero", TOKEN_VERDADERO);
+                }
+            }
+            break;
         case 'y':
             return check_keyword(lexer, 1, 0, "", TOKEN_Y);
     }
