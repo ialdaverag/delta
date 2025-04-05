@@ -128,7 +128,8 @@ void test_lexer_keywords(void) {
         {"const", TOKEN_CONST}, 
         {"si", TOKEN_SI},
         {"sino", TOKEN_SINO},
-        {"segun", TOKEN_SEGUN}
+        {"segun", TOKEN_SEGUN},
+        {"caso", TOKEN_CASO}
     };
 
     for (int i = 0; i < sizeof(casos) / sizeof(casos[0]); i++) {
