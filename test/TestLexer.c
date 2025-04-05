@@ -146,7 +146,8 @@ void test_lexer_keywords(void) {
         {"falso", TOKEN_FALSO},
         {"nulo", TOKEN_NULO},
         {"es", TOKEN_ES},
-        {"en", TOKEN_EN}
+        {"en", TOKEN_EN},
+        {"desde", TOKEN_DESDE}
     };
 
     for (int i = 0; i < sizeof(casos) / sizeof(casos[0]); i++) {

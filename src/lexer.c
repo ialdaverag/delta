@@ -131,6 +131,8 @@ static TokenType identifier_type(Lexer* lexer) {
                 }
             }
             break;
+        case 'd':
+            return check_keyword(lexer, 1, 4, "esde", TOKEN_DESDE);
         case 'e':
             if (lexer->current - lexer->start > 1) {
                 switch (lexer->start[1]) {
