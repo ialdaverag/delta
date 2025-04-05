@@ -111,8 +111,9 @@ void test_Lexer_cadena(void) {
 
 void test_Lexer_identificadores(void) {
     Lexer lexer;
-    Lexer_init(&lexer, "variable _variable otraVariable");
+    Lexer_init(&lexer, "variable _variable otraVariable conio");
 
+    TEST_ASSERT_EQUAL(TOKEN_IDENTIFICADOR, Lexer_next_token(&lexer).type);
     TEST_ASSERT_EQUAL(TOKEN_IDENTIFICADOR, Lexer_next_token(&lexer).type);
     TEST_ASSERT_EQUAL(TOKEN_IDENTIFICADOR, Lexer_next_token(&lexer).type);
     TEST_ASSERT_EQUAL(TOKEN_IDENTIFICADOR, Lexer_next_token(&lexer).type);
@@ -143,7 +144,8 @@ void test_lexer_keywords(void) {
         {"no", TOKEN_NO},
         {"verdadero", TOKEN_VERDADERO},
         {"falso", TOKEN_FALSO},
-        {"nulo", TOKEN_NULO}
+        {"nulo", TOKEN_NULO},
+        {"es", TOKEN_ES}
     };
 
     for (int i = 0; i < sizeof(casos) / sizeof(casos[0]); i++) {

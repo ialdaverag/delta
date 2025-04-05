@@ -26,6 +26,7 @@ typedef enum {
     TOKEN_VERDADERO, // verdadero
     TOKEN_FALSO, // falso
     TOKEN_NULO, // nulo
+    TOKEN_ES, // es
 
     // Identificador
     TOKEN_IDENTIFICADOR, // [a-zA-Z_][a-zA-Z0-9_]*
