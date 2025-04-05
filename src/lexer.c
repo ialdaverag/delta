@@ -110,6 +110,8 @@ static TokenType identifier_type(Lexer* lexer) {
         case 's':
             if (lexer->current - lexer->start > 1) {
                 switch (lexer->start[1]) {
+                    case 'e':
+                        return check_keyword(lexer, 1, 4, "egun", TOKEN_SEGUN);
                     case 'i':
                         if (lexer->current - lexer->start == 2)
                             return TOKEN_SI;
@@ -124,6 +126,7 @@ static TokenType identifier_type(Lexer* lexer) {
     
     return TOKEN_IDENTIFICADOR;
 }
+
 
 static Token identifier(Lexer* lexer) {
     while (is_alpha(peek(lexer)) || is_digit(peek(lexer)))
