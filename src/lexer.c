@@ -118,6 +118,8 @@ static TokenType identifier_type(Lexer* lexer) {
                             return check_keyword(lexer, 3, 6, "tinuar", TOKEN_CONTINUAR);
                         }
                         break;
+                    case 'l': 
+                        return check_keyword(lexer, 2, 3, "ase", TOKEN_CLASE);  
                 }
             }
             break;

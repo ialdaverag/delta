@@ -136,7 +136,8 @@ void test_lexer_keywords(void) {
         {"continuar", TOKEN_CONTINUAR},
         {"romper", TOKEN_ROMPER},
         {"fun", TOKEN_FUN},
-        {"ret", TOKEN_RET}
+        {"ret", TOKEN_RET},
+        {"clase", TOKEN_CLASE}
     };
 
     for (int i = 0; i < sizeof(casos) / sizeof(casos[0]); i++) {
