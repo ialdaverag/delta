@@ -29,6 +29,7 @@ typedef enum {
     TOKEN_ES, // es
     TOKEN_EN, // en
     TOKEN_DESDE, // desde
+    TOKEN_COMO, // como
 
     // Identificador
     TOKEN_IDENTIFICADOR, // [a-zA-Z_][a-zA-Z0-9_]*

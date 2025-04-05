@@ -123,6 +123,8 @@ static TokenType identifier_type(Lexer* lexer) {
                                         }
                                     }
                                     break;
+                                case 'm':
+                                    return check_keyword(lexer, 3, 1, "o", TOKEN_COMO);
                             }
                         }
                         break;
