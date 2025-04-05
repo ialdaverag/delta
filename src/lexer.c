@@ -119,6 +119,8 @@ static TokenType identifier_type(Lexer* lexer) {
             return check_keyword(lexer, 1, 7, "ientras", TOKEN_MIENTRAS);
         case 'o':
             return check_keyword(lexer, 1, 3, "tro", TOKEN_OTRO);
+        case 'p':
+            return check_keyword(lexer, 1, 3, "ara", TOKEN_PARA);
         case 's':
             if (lexer->current - lexer->start > 1) {
                 switch (lexer->start[1]) {

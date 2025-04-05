@@ -131,7 +131,8 @@ void test_lexer_keywords(void) {
         {"segun", TOKEN_SEGUN},
         {"caso", TOKEN_CASO},
         {"otro", TOKEN_OTRO},
-        {"mientras", TOKEN_MIENTRAS}
+        {"mientras", TOKEN_MIENTRAS},
+        {"para", TOKEN_PARA}
     };
 
     for (int i = 0; i < sizeof(casos) / sizeof(casos[0]); i++) {
