@@ -130,7 +130,15 @@ static TokenType identifier_type(Lexer* lexer) {
         case 'p':
             return check_keyword(lexer, 1, 3, "ara", TOKEN_PARA);
         case 'r':
-            return check_keyword(lexer, 1, 5, "omper", TOKEN_ROMPER);
+            if (lexer->current - lexer->start > 1) {
+                switch (lexer->start[1]) {
+                    case 'e': 
+                        return check_keyword(lexer, 2, 1, "t", TOKEN_RET);
+                    case 'o': 
+                        return check_keyword(lexer, 2, 4, "mper", TOKEN_ROMPER);
+                }
+            }
+            break;
         case 's':
             if (lexer->current - lexer->start > 1) {
                 switch (lexer->start[1]) {
