@@ -107,6 +107,8 @@ static TokenType identifier_type(Lexer* lexer) {
     switch (lexer->start[0]) {
         case 'c':
             return check_keyword(lexer, 1, 4, "onst", TOKEN_CONST);
+        case 's':
+            return check_keyword(lexer, 1, 1, "i", TOKEN_SI);
         case 'v':
             return check_keyword(lexer, 1, 2, "ar", TOKEN_VAR);
     }

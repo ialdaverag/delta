@@ -126,6 +126,7 @@ void test_lexer_keywords(void) {
     } casos[] = {
         {"var", TOKEN_VAR},
         {"const", TOKEN_CONST}, 
+        {"si", TOKEN_SI}
     };
 
     for (int i = 0; i < sizeof(casos) / sizeof(casos[0]); i++) {
