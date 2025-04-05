@@ -124,7 +124,15 @@ static TokenType identifier_type(Lexer* lexer) {
             }
             break;
         case 'f':
-            return check_keyword(lexer, 1, 2, "un", TOKEN_FUN);
+            if (lexer->current - lexer->start > 1) {
+                switch (lexer->start[1]) {
+                    case 'a': 
+                        return check_keyword(lexer, 2, 3, "lso", TOKEN_FALSO);
+                    case 'u': 
+                        return check_keyword(lexer, 2, 1, "n", TOKEN_FUN);
+                }
+            }
+            break;
         case 'm':
             return check_keyword(lexer, 1, 7, "ientras", TOKEN_MIENTRAS);
         case 'n':
@@ -175,7 +183,6 @@ static TokenType identifier_type(Lexer* lexer) {
     
     return TOKEN_IDENTIFICADOR;
 }
-
 
 static Token identifier(Lexer* lexer) {
     while (is_alpha(peek(lexer)) || is_digit(peek(lexer)))
