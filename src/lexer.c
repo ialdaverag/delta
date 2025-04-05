@@ -108,7 +108,16 @@ static TokenType identifier_type(Lexer* lexer) {
         case 'c':
             return check_keyword(lexer, 1, 4, "onst", TOKEN_CONST);
         case 's':
-            return check_keyword(lexer, 1, 1, "i", TOKEN_SI);
+            if (lexer->current - lexer->start > 1) {
+                switch (lexer->start[1]) {
+                    case 'i':
+                        if (lexer->current - lexer->start == 2)
+                            return TOKEN_SI;
+                            
+                        return check_keyword(lexer, 2, 2, "no", TOKEN_SINO);
+                }
+            }
+            break;
         case 'v':
             return check_keyword(lexer, 1, 2, "ar", TOKEN_VAR);
     }
