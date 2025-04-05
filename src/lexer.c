@@ -115,6 +115,8 @@ static TokenType identifier_type(Lexer* lexer) {
                 }
             }
             break;
+        case 'o':
+            return check_keyword(lexer, 1, 3, "tro", TOKEN_OTRO);
         case 's':
             if (lexer->current - lexer->start > 1) {
                 switch (lexer->start[1]) {
