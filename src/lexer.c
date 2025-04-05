@@ -156,6 +156,8 @@ static TokenType identifier_type(Lexer* lexer) {
             break;
         case 'v':
             return check_keyword(lexer, 1, 2, "ar", TOKEN_VAR);
+        case 'y':
+            return check_keyword(lexer, 1, 0, "", TOKEN_Y);
     }
     
     return TOKEN_IDENTIFICADOR;
