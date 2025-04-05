@@ -33,6 +33,7 @@ typedef enum {
     TOKEN_COMO, // como
     TOKEN_ASEGURAR, // asegurar,
     TOKEN_PASAR, // pasar
+    TOKEN_LANZAR, // lanzar
 
     // Identificador
     TOKEN_IDENTIFICADOR, // [a-zA-Z_][a-zA-Z0-9_]*
