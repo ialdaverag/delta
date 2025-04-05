@@ -31,6 +31,7 @@ typedef enum {
     TOKEN_IMPORTAR, // importar
     TOKEN_DESDE, // desde
     TOKEN_COMO, // como
+    TOKEN_ASEGURAR, // asegurar
 
     // Identificador
     TOKEN_IDENTIFICADOR, // [a-zA-Z_][a-zA-Z0-9_]*

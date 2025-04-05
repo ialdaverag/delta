@@ -105,6 +105,8 @@ static TokenType check_keyword(Lexer* lexer, int start, int length, const char* 
 
 static TokenType identifier_type(Lexer* lexer) {
     switch (lexer->start[0]) {
+        case 'a':
+            return check_keyword(lexer, 1, 7, "segurar", TOKEN_ASEGURAR);
         case 'c':
             if (lexer->current - lexer->start > 1) {
                 switch (lexer->start[1]) {
