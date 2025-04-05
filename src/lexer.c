@@ -121,6 +121,8 @@ static TokenType identifier_type(Lexer* lexer) {
                 }
             }
             break;
+        case 'f':
+            return check_keyword(lexer, 1, 2, "un", TOKEN_FUN);
         case 'm':
             return check_keyword(lexer, 1, 7, "ientras", TOKEN_MIENTRAS);
         case 'o':
