@@ -28,6 +28,7 @@ typedef enum {
     TOKEN_NULO, // nulo
     TOKEN_ES, // es
     TOKEN_EN, // en
+    TOKEN_IMPORTAR, // importar
     TOKEN_DESDE, // desde
     TOKEN_COMO, // como
 

@@ -155,6 +155,8 @@ static TokenType identifier_type(Lexer* lexer) {
                 }
             }
             break;
+        case 'i':
+            return check_keyword(lexer, 1, 7, "mportar", TOKEN_IMPORTAR);
         case 'm':
             return check_keyword(lexer, 1, 7, "ientras", TOKEN_MIENTRAS);
         case 'n':
