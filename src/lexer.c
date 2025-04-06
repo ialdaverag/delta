@@ -125,6 +125,8 @@ static TokenType identifier_type(Lexer* lexer) {
                 }
             }
             break;
+        case 'b':
+            return check_keyword(lexer, 1, 5, "orrar", TOKEN_BORRAR);
         case 'c':
             if (lexer->current - lexer->start > 1) {
                 switch (lexer->start[1]) {

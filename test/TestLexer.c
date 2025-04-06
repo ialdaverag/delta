@@ -159,7 +159,8 @@ void test_lexer_keywords(void) {
         {"gen", TOKEN_GEN},
         {"asinc", TOKEN_ASINC},
         {"aguard", TOKEN_AGUARD},
-        {"con", TOKEN_CON}
+        {"con", TOKEN_CON},
+        {"borrar", TOKEN_BORRAR}
     };
 
     for (int i = 0; i < sizeof(casos) / sizeof(casos[0]); i++) {

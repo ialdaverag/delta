@@ -41,6 +41,7 @@ typedef enum {
     TOKEN_ASINC, // asinc
     TOKEN_AGUARD, // aguard
     TOKEN_CON, // con
+    TOKEN_BORRAR, // borrar
 
     // Identificador
     TOKEN_IDENTIFICADOR, // [a-zA-Z_][a-zA-Z0-9_]*
