@@ -134,9 +134,9 @@ static TokenType identifier_type(Lexer* lexer) {
                         if (lexer->current - lexer->start > 2) {
                             switch (lexer->start[2]) {
                                 case 'n':
-                                    if (lexer->current - lexer->start == 3) {
+                                    if (lexer->current - lexer->start == 3)
                                         return TOKEN_CON;
-                                    }
+                                    
                                     if (lexer->current - lexer->start > 3) {
                                         switch (lexer->start[3]) {
                                             case 's':
@@ -145,7 +145,6 @@ static TokenType identifier_type(Lexer* lexer) {
                                                 return check_keyword(lexer, 4, 5, "inuar", TOKEN_CONTINUAR);
                                         }
                                     }
-                                    break;
                                 case 'm':
                                     return check_keyword(lexer, 3, 1, "o", TOKEN_COMO);
                             }
