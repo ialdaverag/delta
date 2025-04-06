@@ -35,6 +35,7 @@ typedef enum {
     TOKEN_PASAR, // pasar
     TOKEN_LANZAR, // lanzar
     TOKEN_INTENTAR, // intentar
+    TOKEN_ATRAPAR, // atrapar
 
     // Identificador
     TOKEN_IDENTIFICADOR, // [a-zA-Z_][a-zA-Z0-9_]*
