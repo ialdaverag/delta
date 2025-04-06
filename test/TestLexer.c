@@ -156,7 +156,8 @@ void test_lexer_keywords(void) {
         {"intentar", TOKEN_INTENTAR},
         {"atrapar", TOKEN_ATRAPAR},
         {"finalmente", TOKEN_FINALMENTE},
-        {"gen", TOKEN_GEN}
+        {"gen", TOKEN_GEN},
+        {"asinc", TOKEN_ASINC}
     };
 
     for (int i = 0; i < sizeof(casos) / sizeof(casos[0]); i++) {

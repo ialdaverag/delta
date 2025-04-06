@@ -38,6 +38,7 @@ typedef enum {
     TOKEN_INTENTAR, // intentar
     TOKEN_ATRAPAR, // atrapar
     TOKEN_FINALMENTE, // finalmente
+    TOKEN_ASINC, // asinc
 
     // Identificador
     TOKEN_IDENTIFICADOR, // [a-zA-Z_][a-zA-Z0-9_]*

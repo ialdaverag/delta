@@ -108,8 +108,18 @@ static TokenType identifier_type(Lexer* lexer) {
         case 'a':
             if (lexer->current - lexer->start > 1) {
                 switch (lexer->start[1]) {
-                    case 's': return check_keyword(lexer, 2, 6, "egurar", TOKEN_ASEGURAR);
-                    case 't': return check_keyword(lexer, 2, 5, "rapar", TOKEN_ATRAPAR);
+                    case 's':
+                        if (lexer->current - lexer->start > 2) {
+                            switch (lexer->start[2]) {
+                                case 'e': 
+                                    return check_keyword(lexer, 3, 5, "gurar", TOKEN_ASEGURAR);
+                                case 'i': 
+                                    return check_keyword(lexer, 3, 2, "nc", TOKEN_ASINC);
+                            }
+                        }
+                        break;
+                    case 't': 
+                        return check_keyword(lexer, 2, 5, "rapar", TOKEN_ATRAPAR);
                 }
             }
             break;
