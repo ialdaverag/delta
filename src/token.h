@@ -19,6 +19,7 @@ typedef enum {
     TOKEN_ROMPER, // romper
     TOKEN_FUN, // fun
     TOKEN_RET, // retornar
+    TOKEN_GEN, // generar
     TOKEN_CLASE, // clase
     TOKEN_Y, // y
     TOKEN_O, // o

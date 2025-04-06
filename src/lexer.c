@@ -165,6 +165,8 @@ static TokenType identifier_type(Lexer* lexer) {
                 }
             }
             break;
+        case 'g':
+            return check_keyword(lexer, 1, 2, "en", TOKEN_GEN);
         case 'i':
             if (lexer->current - lexer->start > 1) {
                 switch (lexer->start[1]) {
