@@ -118,6 +118,8 @@ static TokenType identifier_type(Lexer* lexer) {
                             }
                         }
                         break;
+                    case 'g':
+                        return check_keyword(lexer, 2, 4, "uard", TOKEN_AGUARD);
                     case 't': 
                         return check_keyword(lexer, 2, 5, "rapar", TOKEN_ATRAPAR);
                 }
