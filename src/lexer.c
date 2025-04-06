@@ -134,6 +134,9 @@ static TokenType identifier_type(Lexer* lexer) {
                         if (lexer->current - lexer->start > 2) {
                             switch (lexer->start[2]) {
                                 case 'n':
+                                    if (lexer->current - lexer->start == 3) {
+                                        return TOKEN_CON;
+                                    }
                                     if (lexer->current - lexer->start > 3) {
                                         switch (lexer->start[3]) {
                                             case 's':
