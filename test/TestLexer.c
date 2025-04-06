@@ -109,6 +109,43 @@ void test_Lexer_cadena(void) {
     }
 }
 
+void test_Lexer_numeros_enteros(void) {
+    const char* casos[] = {
+        "10",
+        "123",
+        "4567",
+        "0",
+        "987654",
+    };
+
+    for (int i = 0; i < sizeof(casos) / sizeof(casos[0]); i++) {
+        Lexer lexer;
+        Lexer_init(&lexer, casos[i]);
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_LITERAL_ENTERO, token.type);
+        TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
+    }
+}
+
+void test_Lexer_numeros_decimales(void) {
+    const char* casos[] = {
+        "10.5",
+        "123.45",
+        "0.99",
+        "0.0",
+    };
+
+    for (int i = 0; i < sizeof(casos) / sizeof(casos[0]); i++) {
+        Lexer lexer;
+        Lexer_init(&lexer, casos[i]);
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_LITERAL_REAL, token.type);
+        TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
+    }
+}
+
 void test_Lexer_identificadores(void) {
     Lexer lexer;
     Lexer_init(&lexer, "variable _variable otraVariable conio");

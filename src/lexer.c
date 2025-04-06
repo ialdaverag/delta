@@ -20,6 +20,13 @@ static char peek(Lexer* lexer) {
     return *lexer->current;
 }
 
+static char peek_next(Lexer* lexer) {
+    if (is_at_end(lexer)) 
+        return '\0';
+
+    return lexer->current[1];
+}
+
 static void skip_whitespace(Lexer* lexer) {
     for (;;) {
         char c = peek(lexer);
@@ -275,6 +282,25 @@ static Token identifier(Lexer* lexer) {
     return make_token(lexer, identifier_type(lexer));
 }
 
+static Token number(Lexer* lexer) {
+    while (is_digit(peek(lexer))) {
+        advance(lexer);
+    }
+    
+    // Buscar parte decimal
+    if (peek(lexer) == '.' && is_digit(peek_next(lexer))) {
+        advance(lexer);
+        
+        while (is_digit(peek(lexer))) {
+            advance(lexer);
+        }
+        
+        return make_token(lexer, TOKEN_LITERAL_REAL);
+    }
+    
+    return make_token(lexer, TOKEN_LITERAL_ENTERO);
+}
+
 Token Lexer_next_token(Lexer* lexer) {
     skip_whitespace(lexer);
 
@@ -287,6 +313,9 @@ Token Lexer_next_token(Lexer* lexer) {
 
     if (is_alpha(c)) 
         return identifier(lexer);
+
+    if (is_digit(c))
+        return number(lexer);
 
     switch (c) {
         // Delimitadores

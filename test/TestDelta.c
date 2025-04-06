@@ -32,6 +32,8 @@ int main(void) {
     RUN_TEST(test_Lexer_operadores_comparacion);
     RUN_TEST(test_Lexer_cadena);
     RUN_TEST(test_Lexer_identificadores);
+    RUN_TEST(test_Lexer_numeros_enteros);
+    RUN_TEST(test_Lexer_numeros_decimales);
     RUN_TEST(test_lexer_keywords);
 
     return UNITY_END();
