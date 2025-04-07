@@ -28,7 +28,7 @@ static char peek_next(Lexer* lexer) {
 }
 
 static void skip_whitespace(Lexer* lexer) {
-    for (;;) {
+    while (true) {
         char c = peek(lexer);
 
         switch (c) {
@@ -42,9 +42,9 @@ static void skip_whitespace(Lexer* lexer) {
                 advance(lexer);
                 break;
             case '#':
-                while (peek(lexer) != '\n' && !is_at_end(lexer)) {
+                while (peek(lexer) != '\n' && !is_at_end(lexer))
                     advance(lexer);
-                }
+                
                 break;
             default:
                 return;
@@ -71,25 +71,6 @@ static bool match(Lexer* lexer, char expected) {
 
     lexer->current++;
     
-    return true;
-}
-
-static bool is_string(Lexer* lexer) {
-    while (peek(lexer) != '"' && !is_at_end(lexer)) {
-        if (peek(lexer) == '\n') {
-            advance(lexer);  // Consume el '\n' para no bloquear el lexer
-
-            return false;
-        }
-
-        advance(lexer);
-    }
-
-    if (is_at_end(lexer))
-        return false;
-
-    advance(lexer);  // Consume la comilla de cierre
-
     return true;
 }
 
@@ -287,9 +268,8 @@ static Token identifier(Lexer* lexer) {
 }
 
 static Token number(Lexer* lexer) {
-    while (is_digit(peek(lexer))) {
+    while (is_digit(peek(lexer)))
         advance(lexer);
-    }
     
     // Buscar parte decimal
     if (peek(lexer) == '.' && is_digit(peek_next(lexer))) {
@@ -302,6 +282,25 @@ static Token number(Lexer* lexer) {
     }
     
     return make_token(lexer, TOKEN_LITERAL_ENTERO);
+}
+
+static Token string(Lexer* lexer) {
+    while (peek(lexer) != '"' && !is_at_end(lexer)) {
+        if (peek(lexer) == '\n') {
+            advance(lexer);
+
+            return error_token(lexer, "ERROR: Cadena no terminada.");
+        }
+
+        advance(lexer);
+    }
+
+    if (is_at_end(lexer))
+        return error_token(lexer, "ERROR: Cadena no terminada.");
+
+    advance(lexer);
+
+    return make_token(lexer, TOKEN_LITERAL_CADENA);
 }
 
 Token Lexer_next_token(Lexer* lexer) {
@@ -319,6 +318,9 @@ Token Lexer_next_token(Lexer* lexer) {
 
     if (is_digit(c))
         return number(lexer);
+
+    if (c == '"')
+        return string(lexer);
 
     switch (c) {
         // Delimitadores
@@ -376,13 +378,6 @@ Token Lexer_next_token(Lexer* lexer) {
                 return make_token(lexer, TOKEN_MAYOR_IGUAL);
 
             return make_token(lexer, TOKEN_MAYOR);
-
-        // Cadena
-        case '"':
-            if (!is_string(lexer))
-                return error_token(lexer, "ERROR: Cadena no terminada.");
-            
-            return make_token(lexer, TOKEN_LITERAL_CADENA);
     }
 
     return error_token(lexer, "ERROR: Caracter inesperado.");
