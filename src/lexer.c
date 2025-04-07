@@ -41,6 +41,11 @@ static void skip_whitespace(Lexer* lexer) {
                 lexer->line++;
                 advance(lexer);
                 break;
+            case '#':
+                while (peek(lexer) != '\n' && !is_at_end(lexer)) {
+                    advance(lexer);
+                }
+                break;
             default:
                 return;
         }
@@ -80,9 +85,8 @@ static bool is_string(Lexer* lexer) {
         advance(lexer);
     }
 
-    if (is_at_end(lexer)) {
+    if (is_at_end(lexer))
         return false;
-    }
 
     advance(lexer);  // Consume la comilla de cierre
 
@@ -291,9 +295,8 @@ static Token number(Lexer* lexer) {
     if (peek(lexer) == '.' && is_digit(peek_next(lexer))) {
         advance(lexer);
         
-        while (is_digit(peek(lexer))) {
+        while (is_digit(peek(lexer)))
             advance(lexer);
-        }
         
         return make_token(lexer, TOKEN_LITERAL_REAL);
     }

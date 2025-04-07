@@ -210,3 +210,51 @@ void test_lexer_keywords(void) {
         TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
     }
 }
+
+void test_Lexer_comments(void) {
+    // Caso 1: Línea con solo comentario
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "# Esto es un comentario");
+        TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
+    }
+
+    // Caso 2: Código con comentario al final
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "x = 5 # Asignación con comentario");
+        TEST_ASSERT_EQUAL(TOKEN_IDENTIFICADOR, Lexer_next_token(&lexer).type); // x
+        TEST_ASSERT_EQUAL(TOKEN_ASIGNACION, Lexer_next_token(&lexer).type);    // =
+        TEST_ASSERT_EQUAL(TOKEN_LITERAL_ENTERO, Lexer_next_token(&lexer).type); // 5
+        TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
+    }
+
+    // Caso 3: Comentario seguido de código en nueva línea
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "# Comentario\nvar x = 10");
+        TEST_ASSERT_EQUAL(TOKEN_VAR, Lexer_next_token(&lexer).type);           // var
+        TEST_ASSERT_EQUAL(TOKEN_IDENTIFICADOR, Lexer_next_token(&lexer).type); // x
+        TEST_ASSERT_EQUAL(TOKEN_ASIGNACION, Lexer_next_token(&lexer).type);    // =
+        TEST_ASSERT_EQUAL(TOKEN_LITERAL_ENTERO, Lexer_next_token(&lexer).type); // 10
+        TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
+    }
+
+    // Caso 4: Comentario en medio de código (debería ignorar el resto de la línea)
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "var #= 5\nx = 10");
+        TEST_ASSERT_EQUAL(TOKEN_VAR, Lexer_next_token(&lexer).type);           // var
+        TEST_ASSERT_EQUAL(TOKEN_IDENTIFICADOR, Lexer_next_token(&lexer).type); // x
+        TEST_ASSERT_EQUAL(TOKEN_ASIGNACION, Lexer_next_token(&lexer).type);    // =
+        TEST_ASSERT_EQUAL(TOKEN_LITERAL_ENTERO, Lexer_next_token(&lexer).type); // 10
+        TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
+    }
+
+    // Caso 5: Múltiples líneas de solo comentarios
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "# Solo comentario\n# Otro comentario\n");
+        TEST_ASSERT_EQUAL(TOKEN_FDA, Lexer_next_token(&lexer).type);
+    }
+}
