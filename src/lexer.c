@@ -271,7 +271,6 @@ static Token number(Lexer* lexer) {
     while (is_digit(peek(lexer)))
         advance(lexer);
     
-    // Buscar parte decimal
     if (peek(lexer) == '.' && is_digit(peek_next(lexer))) {
         advance(lexer);
         
@@ -285,7 +284,9 @@ static Token number(Lexer* lexer) {
 }
 
 static Token string(Lexer* lexer) {
-    while (peek(lexer) != '"' && !is_at_end(lexer)) {
+    char quote_type = lexer->current[-1];
+    
+    while (peek(lexer) != quote_type && !is_at_end(lexer)) {
         if (peek(lexer) == '\n') {
             advance(lexer);
 
@@ -319,7 +320,7 @@ Token Lexer_next_token(Lexer* lexer) {
     if (is_digit(c))
         return number(lexer);
 
-    if (c == '"')
+    if (c == '"' || c == '\'')
         return string(lexer);
 
     switch (c) {

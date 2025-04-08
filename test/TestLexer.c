@@ -89,11 +89,19 @@ void test_Lexer_cadena(void) {
         const char* input;
         TokenType expected;
     } casos[] = {
+        // Comillas dobles
         {"\"Hola mundo\"", TOKEN_LITERAL_CADENA},
         {"\"Esto es una prueba\"", TOKEN_LITERAL_CADENA},
         {"\"\"", TOKEN_LITERAL_CADENA},
         {"\"Falta cierre", TOKEN_ERROR},
-        {"\"Primera línea \n Segunda línea\"", TOKEN_ERROR}
+        {"\"Primera línea \n Segunda línea\"", TOKEN_ERROR},
+
+        // Comillas simples
+        {"'Hola mundo'", TOKEN_LITERAL_CADENA},
+        {"'Esto es una prueba'", TOKEN_LITERAL_CADENA},
+        {"''", TOKEN_LITERAL_CADENA},
+        {"'Falta cierre", TOKEN_ERROR},
+        {"'Primera línea \n Segunda línea'", TOKEN_ERROR}
     };
 
     for (int i = 0; i < sizeof(casos) / sizeof(casos[0]); i++) {
@@ -108,6 +116,7 @@ void test_Lexer_cadena(void) {
         }
     }
 }
+
 
 void test_Lexer_numeros_enteros(void) {
     const char* casos[] = {
