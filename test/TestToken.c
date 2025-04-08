@@ -67,9 +67,10 @@ void test_Token_init() {
         const char* start = keywords[i].lexeme;
         const char* current = start + strlen(start);
         int line = 1;
+        int column = 1 + (int)(current - start);
 
         Token token;
-        Token_init(&token, type, start, current, line);
+        Token_init(&token, type, start, current, line, column);
 
         TEST_ASSERT_EQUAL(type, token.type);
         TEST_ASSERT_EQUAL_STRING(start, token.start);

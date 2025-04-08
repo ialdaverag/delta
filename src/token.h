@@ -94,8 +94,9 @@ typedef struct Token {
     const char* start;
     int length;
     int line;
+    int column;
 } Token;
 
-Token Token_init(Token* token, TokenType type, const char* start, const char* current, int line);
+Token Token_init(Token* token, TokenType type, const char* start, const char* current, int line,  int column);
 
 #endif // TOKEN_H

@@ -4,6 +4,7 @@ void Lexer_init(Lexer* lexer, const char* source) {
     lexer->start = source;
     lexer->current = source;
     lexer->line = 1;
+    lexer->column = 1;
 }
 
 static bool is_at_end(Lexer* lexer) {
@@ -12,6 +13,7 @@ static bool is_at_end(Lexer* lexer) {
 
 static char advance(Lexer* lexer) {
     lexer->current++;
+    lexer->column++;
 
     return lexer->current[-1];
 }
@@ -39,6 +41,7 @@ static void skip_whitespace(Lexer* lexer) {
                 break;
             case '\n':
                 lexer->line++;
+                lexer->column = 1;
                 advance(lexer);
                 break;
             case '#':
@@ -76,14 +79,14 @@ static bool match(Lexer* lexer, char expected) {
 
 static Token make_token(Lexer* lexer, TokenType type) {
     Token token;
-    Token_init(&token, type, lexer->start, lexer->current, lexer->line);
+    Token_init(&token, type, lexer->start, lexer->current, lexer->line, lexer->column);
 
     return token;
 }
 
 static Token error_token(Lexer* lexer, const char* message) {
     Token token;
-    Token_init(&token, TOKEN_ERROR, message, message + strlen(message), lexer->line);
+    Token_init(&token, TOKEN_ERROR, message, message + strlen(message), lexer->line, lexer->column);
 
     return token;
 }
