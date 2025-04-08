@@ -9,3 +9,16 @@ Token Token_init(Token* token, TokenType type, const char* start, const char* cu
     
     return *token;
 }
+
+Token Token_print(Token token) {
+    printf(
+        "Token [L%d:C%d]: %d, %.*s\n", 
+        token.line, 
+        token.column, 
+        token.type, 
+        token.length, 
+        token.start
+    );
+
+    return token;
+}
