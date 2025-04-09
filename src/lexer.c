@@ -61,6 +61,10 @@ static void skip_whitespace(Lexer* lexer) {
     }
 }
 
+static bool is_eof(char c) {
+    return c == '\0';
+}
+
 static bool is_alpha(char c) {
     return (c >= 'a' && c <= 'z') || 
            (c >= 'A' && c <= 'Z') || 
@@ -206,6 +210,10 @@ static TokenType identifier_type(Lexer* lexer) {
     return TOKEN_IDENTIFIER;
 }
 
+static Token eof(Lexer* lexer) {
+    return make_token(lexer, TOKEN_EOF);
+}
+
 static Token identifier(Lexer* lexer) {
     while (is_alpha(peek(lexer)) || is_digit(peek(lexer)))
         advance(lexer);
@@ -253,11 +261,10 @@ static Token string(Lexer* lexer) {
 Token Lexer_next_token(Lexer* lexer) {
     skip_whitespace(lexer);
     lexer->start = lexer->current;
-
-    if (is_at_end(lexer)) return make_token(lexer, TOKEN_EOF);
     
     char c = advance(lexer);
 
+    if (is_eof(c)) return eof(lexer);
     if (is_alpha(c)) return identifier(lexer);
     if (is_digit(c)) return number(lexer);
     if (is_quote(c)) return string(lexer);
@@ -280,8 +287,8 @@ Token Lexer_next_token(Lexer* lexer) {
         case '%': return make_token(lexer, TOKEN_PERCENT);
 
         // Two character tokens
-        case '!': return make_token(lexer, match(lexer, '=') ? TOKEN_BANG_EQUAL : TOKEN_UNKNOWN);
         case '=': return make_token(lexer, match(lexer, '=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
+        case '!': return make_token(lexer, match(lexer, '=') ? TOKEN_BANG_EQUAL : TOKEN_UNKNOWN);
         case '<': return make_token(lexer, match(lexer, '=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
         case '>': return make_token(lexer, match(lexer, '=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
     }
