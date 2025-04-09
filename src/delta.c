@@ -30,7 +30,7 @@ int main(int argc, const char* argv[]) {
         Token token = Lexer_next_token(&lexer);
         Token_print(token);
         
-        if (token.type == TOKEN_FDA || token.type == TOKEN_ERROR) break;
+        if (token.type == TOKEN_EOF || token.type == TOKEN_ERROR) break;
     }
     
     File_free(&file);

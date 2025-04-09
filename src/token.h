@@ -9,7 +9,6 @@ typedef enum {
     TOKEN_CONST, // const
     TOKEN_SI, // si
     TOKEN_SINO, // sino
-    TOKEN_SINO_SI, // sino si
     TOKEN_SEGUN, // segun
     TOKEN_CASO, // caso
     TOKEN_OTRO, // otro
@@ -19,7 +18,6 @@ typedef enum {
     TOKEN_ROMPER, // romper
     TOKEN_FUN, // fun
     TOKEN_RET, // retornar
-    TOKEN_GEN, // generar
     TOKEN_CLASE, // clase
     TOKEN_Y, // y
     TOKEN_O, // o
@@ -27,66 +25,50 @@ typedef enum {
     TOKEN_VERDADERO, // verdadero
     TOKEN_FALSO, // falso
     TOKEN_NULO, // nulo
-    TOKEN_ES, // es
-    TOKEN_EN, // en
-    TOKEN_IMPORTAR, // importar
-    TOKEN_DESDE, // desde
-    TOKEN_COMO, // como
-    TOKEN_ASEGURAR, // asegurar,
-    TOKEN_PASAR, // pasar
-    TOKEN_LANZAR, // lanzar
-    TOKEN_INTENTAR, // intentar
-    TOKEN_ATRAPAR, // atrapar
-    TOKEN_FINALMENTE, // finalmente
-    TOKEN_ASINC, // asinc
-    TOKEN_AGUARD, // aguard
-    TOKEN_CON, // con
-    TOKEN_BORRAR, // borrar
 
     // Identificador
-    TOKEN_IDENTIFICADOR, // [a-zA-Z_][a-zA-Z0-9_]*
+    TOKEN_IDENTIFIER, // [a-zA-Z_][a-zA-Z0-9_]*
 
     // Literales
-    TOKEN_LITERAL_ENTERO, // [0-9]+
-    TOKEN_LITERAL_REAL, // [0-9]+.[0-9]+
-    TOKEN_LITERAL_CADENA, // ".*" o '.*'
+    TOKEN_INTEGER, // [0-9]+
+    TOKEN_FLOAT, // [0-9]+.[0-9]+
+    TOKEN_STRING, // ".*" o '.*'
 
     // Operadores
-    TOKEN_ASIGNACION, // =
+    TOKEN_EQUAL, // =
 
-    TOKEN_MAS, // +
-    TOKEN_MENOS, // -
-    TOKEN_ASTERISCO, // *
-    TOKEN_DIAGONAL, // /
-    TOKEN_PORCENTAJE, // %
+    TOKEN_PLUS, // +
+    TOKEN_MINUS, // -
+    TOKEN_STAR, // *
+    TOKEN_SLASH, // /
+    TOKEN_PERCENT, // %
 
-    TOKEN_IGUAL, // ==
-    TOKEN_DISTINTO, // !=
-    TOKEN_MAYOR, // >
-    TOKEN_MAYOR_IGUAL, // >=
-    TOKEN_MENOR, // <
-    TOKEN_MENOR_IGUAL, // <=
+    TOKEN_EQUAL_EQUAL, // ==
+    TOKEN_BANG_EQUAL, // !=
+    TOKEN_LESS, // <
+    TOKEN_LESS_EQUAL, // <=
+    TOKEN_GREATER, // >
+    TOKEN_GREATER_EQUAL, // >=
 
     // Delimitadores
-    TOKEN_PARENTESIS_IZQUIERDO, // (
-    TOKEN_PARENTESIS_DERECHO, // )
-    TOKEN_CORCHETE_IZQUIERDO, // [
-    TOKEN_CORCHETE_DERECHO, // ]
-    TOKEN_LLAVE_IZQUIERDA, // {
-    TOKEN_LLAVE_DERECHA, // }
-    TOKEN_PUNTO, // .
-    TOKEN_COMA, // ,
-    TOKEN_DOS_PUNTOS, // :
-    TOKEN_COMILLA, // "
+    TOKEN_LEFT_PARENTHESIS, // (
+    TOKEN_LEFT_BRACKET, // [
+    TOKEN_LEFT_BRACE, // {
+    TOKEN_RIGHT_PARENTHESIS, // )
+    TOKEN_RIGHT_BRACKET, // ]
+    TOKEN_RIGHT_BRACE, // }
+    TOKEN_COMMA, // ,
+    TOKEN_DOT, // .
+    TOKEN_COLON, // :
 
-    // Comentarios
-    TOKEN_COMENTARIO, // #.*
-
-    // Fin de archivo
-    TOKEN_FDA, // \0
+    // Desconocido
+    TOKEN_UNKNOWN, // Caracter desconocido
 
     // Errores
     TOKEN_ERROR, // Error de análisis
+
+    // Fin de archivo
+    TOKEN_EOF, // \0
 } TokenType;
 
 typedef struct Token {

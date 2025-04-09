@@ -9,7 +9,6 @@ void test_Token_init() {
         {TOKEN_CONST, "const"},
         {TOKEN_SI, "si"},
         {TOKEN_SINO, "sino"},
-        {TOKEN_SINO_SI, "sino si"},
         {TOKEN_SEGUN, "segun"},
         {TOKEN_CASO, "caso"},
         {TOKEN_OTRO, "otro"},
@@ -27,39 +26,37 @@ void test_Token_init() {
         {TOKEN_FALSO, "falso"},
         {TOKEN_NULO, "nulo"},
 
-        {TOKEN_IDENTIFICADOR, "identificador"},
-        {TOKEN_LITERAL_ENTERO, "123"},
-        {TOKEN_LITERAL_REAL, "123.45"},
-        {TOKEN_LITERAL_CADENA, "\"cadena\""},
+        {TOKEN_IDENTIFIER, "identificador"},
+        {TOKEN_INTEGER, "123"},
+        {TOKEN_FLOAT, "123.45"},
+        {TOKEN_STRING, "\"cadena\""},
 
-        {TOKEN_ASIGNACION, "="},
+        {TOKEN_EQUAL, "="},
 
-        {TOKEN_MAS, "+"},
-        {TOKEN_MENOS, "-"},
-        {TOKEN_ASTERISCO, "*"},
-        {TOKEN_DIAGONAL, "/"},
-        {TOKEN_PORCENTAJE, "%"},
+        {TOKEN_PLUS, "+"},
+        {TOKEN_MINUS, "-"},
+        {TOKEN_STAR, "*"},
+        {TOKEN_SLASH, "/"},
+        {TOKEN_PERCENT, "%"},
 
-        {TOKEN_IGUAL, "=="},
-        {TOKEN_DISTINTO, "!="},
-        {TOKEN_MAYOR, ">"},
-        {TOKEN_MAYOR_IGUAL, ">="},
-        {TOKEN_MENOR, "<"},
-        {TOKEN_MENOR_IGUAL, "<="},
+        {TOKEN_EQUAL_EQUAL, "=="},
+        {TOKEN_BANG_EQUAL, "!="},
+        {TOKEN_GREATER, ">"},
+        {TOKEN_GREATER_EQUAL, ">="},
+        {TOKEN_LESS, "<"},
+        {TOKEN_LESS_EQUAL, "<="},
 
-        {TOKEN_PARENTESIS_IZQUIERDO, "("},
-        {TOKEN_PARENTESIS_DERECHO, ")"},
-        {TOKEN_CORCHETE_IZQUIERDO, "["},
-        {TOKEN_CORCHETE_DERECHO, "]"},
-        {TOKEN_LLAVE_IZQUIERDA, "{"},
-        {TOKEN_LLAVE_DERECHA, "}"},
-        {TOKEN_PUNTO, "."},
-        {TOKEN_COMA, ","},
-        {TOKEN_DOS_PUNTOS, ":"},
+        {TOKEN_LEFT_PARENTHESIS, "("},
+        {TOKEN_RIGHT_PARENTHESIS, ")"},
+        {TOKEN_LEFT_BRACKET, "["},
+        {TOKEN_RIGHT_BRACKET, "]"},
+        {TOKEN_LEFT_BRACE, "{"},
+        {TOKEN_RIGHT_BRACE, "}"},
+        {TOKEN_DOT, "."},
+        {TOKEN_COMMA, ","},
+        {TOKEN_COLON, ":"},
 
-        {TOKEN_COMENTARIO, "# comentario"},
-
-        {TOKEN_FDA, "\0"}
+        {TOKEN_EOF, "\0"}
     };
 
     for (size_t i = 0; i < sizeof(keywords) / sizeof(keywords[0]); i++) {
