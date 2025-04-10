@@ -119,11 +119,8 @@ static Token error_token(Lexer* lexer, const char* message) {
     return token;
 }
 
-static TokenType check_keyword(Lexer* lexer, int start, int length, const char* rest, TokenType type) {
-    if (lexer->current - lexer->start == start + length && memcmp(lexer->start + start, rest, length) == 0)
-        return type;
-
-    return TOKEN_IDENTIFIER;
+static bool is_keyword(Lexer* lexer, int length, int offset, const char* keyword, int keyword_length) {
+    return (lexer->current - lexer->start == length) && (memcmp(lexer->start + offset, keyword, keyword_length) == 0);
 }
 
 static TokenType identifier_type(Lexer* lexer) {
@@ -131,41 +128,41 @@ static TokenType identifier_type(Lexer* lexer) {
 
     switch (lexer->start[0]) {
         case 'c':
-            if (length == 4 && memcmp(lexer->start + 1, "aso", 3) == 0) return TOKEN_CASO;
-            if (length == 5 && memcmp(lexer->start + 1, "lase", 4) == 0) return TOKEN_CLASE;
-            if (length == 5 && memcmp(lexer->start + 1, "onst", 4) == 0) return TOKEN_CONST;
-            if (length == 9 && memcmp(lexer->start + 1, "ontinuar", 8) == 0) return TOKEN_CONTINUAR;
+            if (is_keyword(lexer, 4, 1, "aso", 3)) return TOKEN_CASO;
+            if (is_keyword(lexer, 5, 1, "lase", 4)) return TOKEN_CLASE;
+            if (is_keyword(lexer, 5, 1, "onst", 4)) return TOKEN_CONST;
+            if (is_keyword(lexer, 9, 1, "ontinuar", 8)) return TOKEN_CONTINUAR;
             break;
         case 'f':
-            if (length == 3 && memcmp(lexer->start + 1, "un", 2) == 0) return TOKEN_FUN;
-            if (length == 5 && memcmp(lexer->start + 1, "also", 4) == 0) return TOKEN_FALSO;
+            if (is_keyword(lexer, 3, 1, "un", 2)) return TOKEN_FUN;
+            if (is_keyword(lexer, 5, 1, "also", 4)) return TOKEN_FALSO;
             break;
         case 'm':
-            if (length == 8 && memcmp(lexer->start + 1, "ientras", 7) == 0) return TOKEN_MIENTRAS;
+            if (is_keyword(lexer, 8, 1, "ientras", 7)) return TOKEN_MIENTRAS;
             break;
         case 'n':
-            if (length == 2 && memcmp(lexer->start + 1, "o", 1) == 0) return TOKEN_NO;
-            if (length == 4 && memcmp(lexer->start + 1, "ulo", 3) == 0) return TOKEN_NULO;
+            if (is_keyword(lexer, 2, 1, "o", 1)) return TOKEN_NO;
+            if (is_keyword(lexer, 4, 1, "ulo", 3)) return TOKEN_NULO;
             break;
         case 'o':
-            if (length == 4 && memcmp(lexer->start + 1, "tro", 3) == 0) return TOKEN_OTRO;
+            if (is_keyword(lexer, 4, 1, "tro", 3)) return TOKEN_OTRO;
             if (length == 1) return TOKEN_O;
             break;
         case 'p':
-            if (length == 4 && memcmp(lexer->start + 1, "ara", 3) == 0) return TOKEN_PARA;
+            if (is_keyword(lexer, 4, 1, "ara", 3)) return TOKEN_PARA;
             break;
         case 'r':
-            if (length == 3 && memcmp(lexer->start + 1, "et", 2) == 0) return TOKEN_RET;
-            if (length == 6 && memcmp(lexer->start + 1, "omper", 5) == 0) return TOKEN_ROMPER;
+            if (is_keyword(lexer, 3, 1, "et", 2)) return TOKEN_RET;
+            if (is_keyword(lexer, 6, 1, "omper", 5)) return TOKEN_ROMPER;
             break;
         case 's':
-            if (length == 2 && memcmp(lexer->start + 1, "i", 1) == 0) return TOKEN_SI;
-            if (length == 4 && memcmp(lexer->start + 1, "ino", 3) == 0) return TOKEN_SINO;
-            if (length == 5 && memcmp(lexer->start + 1, "egun", 4) == 0) return TOKEN_SEGUN;
+            if (is_keyword(lexer, 2, 1, "i", 1)) return TOKEN_SI;
+            if (is_keyword(lexer, 4, 1, "ino", 3)) return TOKEN_SINO;
+            if (is_keyword(lexer, 5, 1, "egun", 4)) return TOKEN_SEGUN;
             break;
         case 'v':
-            if (length == 3 && memcmp(lexer->start + 1, "ar", 2) == 0) return TOKEN_VAR;
-            if (length == 9 && memcmp(lexer->start + 1, "erdadero", 8) == 0) return TOKEN_VERDADERO;
+            if (is_keyword(lexer, 3, 1, "ar", 2)) return TOKEN_VAR;
+            if (is_keyword(lexer, 9, 1, "erdadero", 8)) return TOKEN_VERDADERO;
             break;
         case 'y':
             if (length == 1) return TOKEN_Y;
