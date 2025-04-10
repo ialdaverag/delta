@@ -127,86 +127,51 @@ static TokenType check_keyword(Lexer* lexer, int start, int length, const char* 
 }
 
 static TokenType identifier_type(Lexer* lexer) {
+    int length = lexer->current - lexer->start;
+
     switch (lexer->start[0]) {
         case 'c':
-            if (lexer->current - lexer->start > 1) {
-                switch (lexer->start[1]) {
-                    case 'a': return check_keyword(lexer, 2, 2, "so", TOKEN_CASO);
-                    case 'o':
-                        if (lexer->current - lexer->start > 2) {
-                            switch (lexer->start[2]) {
-                                case 'n':
-                                    if (lexer->current - lexer->start > 3) {
-                                        switch (lexer->start[3]) {
-                                            case 's': return check_keyword(lexer, 4, 1, "t", TOKEN_CONST);
-                                            case 't': return check_keyword(lexer, 4, 5, "inuar", TOKEN_CONTINUAR);
-                                        }
-                                    }
-                                    break;
-                            }
-                        }
-                        break;
-                    case 'l': return check_keyword(lexer, 2, 3, "ase", TOKEN_CLASE);
-                }
-            }
+            if (length == 4 && memcmp(lexer->start + 1, "aso", 3) == 0) return TOKEN_CASO;
+            if (length == 5 && memcmp(lexer->start + 1, "lase", 4) == 0) return TOKEN_CLASE;
+            if (length == 5 && memcmp(lexer->start + 1, "onst", 4) == 0) return TOKEN_CONST;
+            if (length == 9 && memcmp(lexer->start + 1, "ontinuar", 8) == 0) return TOKEN_CONTINUAR;
             break;
         case 'f':
-            if (lexer->current - lexer->start > 1) {
-                switch (lexer->start[1]) {
-                    case 'a': return check_keyword(lexer, 2, 3, "lso", TOKEN_FALSO);
-                    case 'u': return check_keyword(lexer, 2, 1, "n", TOKEN_FUN);
-                }
-            }
+            if (length == 3 && memcmp(lexer->start + 1, "un", 2) == 0) return TOKEN_FUN;
+            if (length == 5 && memcmp(lexer->start + 1, "also", 4) == 0) return TOKEN_FALSO;
             break;
         case 'm':
-            return check_keyword(lexer, 1, 7, "ientras", TOKEN_MIENTRAS);
+            if (length == 8 && memcmp(lexer->start + 1, "ientras", 7) == 0) return TOKEN_MIENTRAS;
+            break;
         case 'n':
-            if (lexer->current - lexer->start > 1) {
-                switch (lexer->start[1]) {
-                    case 'o': return check_keyword(lexer, 2, 0, "", TOKEN_NO);
-                    case 'u': return check_keyword(lexer, 2, 2, "lo", TOKEN_NULO);
-                }
-            }
+            if (length == 2 && memcmp(lexer->start + 1, "o", 1) == 0) return TOKEN_NO;
+            if (length == 4 && memcmp(lexer->start + 1, "ulo", 3) == 0) return TOKEN_NULO;
             break;
         case 'o':
-            if (lexer->current - lexer->start > 1) 
-                return check_keyword(lexer, 1, 3, "tro", TOKEN_OTRO);
-
-            return TOKEN_O;
+            if (length == 4 && memcmp(lexer->start + 1, "tro", 3) == 0) return TOKEN_OTRO;
+            if (length == 1) return TOKEN_O;
+            break;
         case 'p':
-            return check_keyword(lexer, 1, 3, "ara", TOKEN_PARA);
+            if (length == 4 && memcmp(lexer->start + 1, "ara", 3) == 0) return TOKEN_PARA;
+            break;
         case 'r':
-            if (lexer->current - lexer->start > 1) {
-                switch (lexer->start[1]) {
-                    case 'e': return check_keyword(lexer, 2, 1, "t", TOKEN_RET);
-                    case 'o': return check_keyword(lexer, 2, 4, "mper", TOKEN_ROMPER);
-                }
-            }
+            if (length == 3 && memcmp(lexer->start + 1, "et", 2) == 0) return TOKEN_RET;
+            if (length == 6 && memcmp(lexer->start + 1, "omper", 5) == 0) return TOKEN_ROMPER;
             break;
         case 's':
-            if (lexer->current - lexer->start > 1) {
-                switch (lexer->start[1]) {
-                    case 'e': return check_keyword(lexer, 1, 4, "egun", TOKEN_SEGUN);
-                    case 'i':
-                        if (lexer->current - lexer->start == 2)
-                            return TOKEN_SI;
-                            
-                        return check_keyword(lexer, 2, 2, "no", TOKEN_SINO);
-                }
-            }
+            if (length == 2 && memcmp(lexer->start + 1, "i", 1) == 0) return TOKEN_SI;
+            if (length == 4 && memcmp(lexer->start + 1, "ino", 3) == 0) return TOKEN_SINO;
+            if (length == 5 && memcmp(lexer->start + 1, "egun", 4) == 0) return TOKEN_SEGUN;
             break;
         case 'v':
-            if (lexer->current - lexer->start > 1) {
-                switch (lexer->start[1]) {
-                    case 'a': return check_keyword(lexer, 2, 1, "r", TOKEN_VAR);
-                    case 'e': return check_keyword(lexer, 2, 7, "rdadero", TOKEN_VERDADERO);
-                }
-            }
+            if (length == 3 && memcmp(lexer->start + 1, "ar", 2) == 0) return TOKEN_VAR;
+            if (length == 9 && memcmp(lexer->start + 1, "erdadero", 8) == 0) return TOKEN_VERDADERO;
             break;
         case 'y':
-            return check_keyword(lexer, 1, 0, "", TOKEN_Y);
+            if (length == 1) return TOKEN_Y;
+            break;
     }
-    
+
     return TOKEN_IDENTIFIER;
 }
 
@@ -263,7 +228,7 @@ Token Lexer_next_token(Lexer* lexer) {
     lexer->start = lexer->current;
     
     char c = advance(lexer);
-
+    
     if (is_eof(c)) return eof(lexer);
     if (is_alpha(c)) return identifier(lexer);
     if (is_digit(c)) return number(lexer);
