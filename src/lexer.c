@@ -50,15 +50,14 @@ static void skip_whitespace(Lexer* lexer) {
                 lexer->column = 1;
                 advance(lexer);
                 break;
-            case '#':
-                while (peek(lexer) != '\n' && !is_at_end(lexer)) {
-                    advance(lexer);
-                }
-                break;
             default:
                 return;
         }
     }
+}
+
+static bool is_hash(char c) {
+    return c == '#';
 }
 
 static bool is_eof(char c) {
@@ -176,6 +175,14 @@ static Token eof(Lexer* lexer) {
     return make_token(lexer, TOKEN_EOF);
 }
 
+static Token comment(Lexer* lexer) {
+    while (peek(lexer) != '\n' && !is_at_end(lexer)) {
+        advance(lexer);
+    }
+
+    return make_token(lexer, TOKEN_COMMENT);
+}
+
 static Token identifier(Lexer* lexer) {
     while (is_alpha(peek(lexer)) || is_digit(peek(lexer)))
         advance(lexer);
@@ -227,6 +234,7 @@ Token Lexer_next_token(Lexer* lexer) {
     char c = advance(lexer);
     
     if (is_eof(c)) return eof(lexer);
+    if (is_hash(c)) return comment(lexer);
     if (is_alpha(c)) return identifier(lexer);
     if (is_digit(c)) return number(lexer);
     if (is_quote(c)) return string(lexer);

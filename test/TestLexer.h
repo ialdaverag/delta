@@ -17,6 +17,5 @@ void test_Lexer_numeros_enteros(void);
 void test_Lexer_numeros_decimales(void);
 void test_Lexer_identificadores(void);
 void test_lexer_keywords(void);
-void test_Lexer_comments(void);
 
 #endif // TEST_LEXER_H

@@ -61,6 +61,9 @@ typedef enum {
     TOKEN_DOT, // .
     TOKEN_COLON, // :
 
+    // Comentario
+    TOKEN_COMMENT, // #.*
+
     // Desconocido
     TOKEN_UNKNOWN, // Caracter desconocido
 
