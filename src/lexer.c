@@ -46,8 +46,6 @@ static void skip_whitespace(Lexer* lexer) {
                 advance(lexer);
                 break;
             case '\n':
-                lexer->line++;
-                lexer->column = 1;
                 advance(lexer);
                 break;
             default:
@@ -86,23 +84,27 @@ static bool match(Lexer* lexer, char expected) {
         return false;
 
     lexer->current++;
+    lexer->column++;
     
     return true;
 }
 
 static Token make_token(Lexer* lexer, TokenType type) {
     Token token;
+    int length = (int)(lexer->current - lexer->start);
+
     Token_init(
-        &token, 
-        type, 
-        lexer->start, 
-        lexer->current, 
-        lexer->line, 
-        lexer->column - (int)(lexer->current - lexer->start)
+        &token,
+        type,
+        lexer->start,
+        lexer->current,
+        lexer->line,
+        lexer->column - length
     );
 
     return token;
 }
+
 
 static Token error_token(Lexer* lexer, const char* message) {
     Token token;
@@ -241,6 +243,11 @@ Token Lexer_next_token(Lexer* lexer) {
 
     switch (c) {
         // One character tokens
+        case '+': return make_token(lexer, TOKEN_PLUS);
+        case '-': return make_token(lexer, TOKEN_MINUS);
+        case '*': return make_token(lexer, TOKEN_STAR);
+        case '/': return make_token(lexer, TOKEN_SLASH);
+        case '%': return make_token(lexer, TOKEN_PERCENT);
         case '(': return make_token(lexer, TOKEN_LEFT_PARENTHESIS);
         case '[': return make_token(lexer, TOKEN_LEFT_BRACKET);
         case '{': return make_token(lexer, TOKEN_LEFT_BRACE);
@@ -250,11 +257,6 @@ Token Lexer_next_token(Lexer* lexer) {
         case ',': return make_token(lexer, TOKEN_COMMA);
         case '.': return make_token(lexer, TOKEN_DOT);
         case ':': return make_token(lexer, TOKEN_COLON);
-        case '+': return make_token(lexer, TOKEN_PLUS);
-        case '-': return make_token(lexer, TOKEN_MINUS);
-        case '*': return make_token(lexer, TOKEN_STAR);
-        case '/': return make_token(lexer, TOKEN_SLASH);
-        case '%': return make_token(lexer, TOKEN_PERCENT);
 
         // Two character tokens
         case '=': return make_token(lexer, match(lexer, '=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);

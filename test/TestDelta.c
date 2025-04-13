@@ -23,18 +23,17 @@ int main(void) {
 
     // Tests para lexer.c
     RUN_TEST(test_Lexer_init);
-    RUN_TEST(test_Lexer_token_fda);
-    RUN_TEST(test_Lexer_ignore_whitespace);
-    RUN_TEST(test_Lexer_unexpected_character);
-    RUN_TEST(test_Lexer_token_delimitadores);
-    RUN_TEST(test_Lexer_operador_asignacion);
-    RUN_TEST(test_Lexer_operadores_aritmeticos);
-    RUN_TEST(test_Lexer_operadores_comparacion);
-    RUN_TEST(test_Lexer_cadena);
-    RUN_TEST(test_Lexer_identificadores);
-    RUN_TEST(test_Lexer_numeros_enteros);
-    RUN_TEST(test_Lexer_numeros_decimales);
-    RUN_TEST(test_lexer_keywords);
+    RUN_TEST(test_Lexer_position_tracking);
+    RUN_TEST(test_Lexer_EOF);
+    RUN_TEST(test_Lexer_unknown);
+    RUN_TEST(test_Lexer_whitespace);
+    RUN_TEST(test_Lexer_one_char_token);
+    RUN_TEST(test_Lexer_one_or_two_char_token);
+    RUN_TEST(test_Lexer_identifier);
+    RUN_TEST(test_Lexer_keyword);
+    RUN_TEST(test_Lexer_number);
+    RUN_TEST(test_Lexer_string);
+    RUN_TEST(test_Lexer_comment);
 
     return UNITY_END();
 }
