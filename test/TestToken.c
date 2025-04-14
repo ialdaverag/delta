@@ -1,6 +1,6 @@
 #include "TestToken.h"
 
-void test_Token_init_EOF() {
+static void test_Token_init_EOF() {
     Token token;
     const char* lexeme = "\0";
 
@@ -12,7 +12,7 @@ void test_Token_init_EOF() {
     Token_free(&token);
 }
 
-void test_Token_init_unknown() {
+static void test_Token_init_unknown() {
     Token token;
     const char* lexeme = "!";
 
@@ -24,7 +24,7 @@ void test_Token_init_unknown() {
     Token_free(&token);
 }
 
-void test_Token_init_error() {
+static void test_Token_init_error() {
     Token token;
     const char* lexeme = "error";
 
@@ -33,11 +33,10 @@ void test_Token_init_error() {
     TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
     TEST_ASSERT_EQUAL_INT(1, token.line);
     TEST_ASSERT_EQUAL_INT(1, token.column);
-    TEST_ASSERT_NOT_NULL(token.lexeme);
     Token_free(&token);
 }
 
-void test_Token_init_one_char() {
+static void test_Token_init_one_char() {
     {
         Token token;
         const char* lexeme = "+";
@@ -194,7 +193,7 @@ void test_Token_init_one_char() {
     }
 }
 
-void test_Token_init_one_or_two_chars() {
+static void test_Token_init_one_or_two_chars() {
     {
         Token token;
         const char* lexeme = "=";
@@ -252,7 +251,7 @@ void test_Token_init_one_or_two_chars() {
     }
 }
 
-void test_Token_init_identifiers() {
+static void test_Token_init_identifiers() {
     {
         const char* lexeme = "var1";
 
@@ -294,7 +293,7 @@ void test_Token_init_identifiers() {
     }
 }
 
-void test_Token_init_keywords() {
+static void test_Token_init_keywords() {
     {
         Token token;
         const char* lexeme = "var";
@@ -517,7 +516,7 @@ void test_Token_init_keywords() {
     }
 }
 
-void test_Token_init_strings() {
+static void test_Token_init_strings() {
     {
         Token token;
         const char* lexeme = "\"Hola, mundo!\"";
@@ -542,7 +541,7 @@ void test_Token_init_strings() {
     }
 }
 
-void test_Token_init_numbers() {
+static void test_Token_init_numbers() {
     {
         Token token;
         const char* lexeme = "123";
@@ -567,7 +566,7 @@ void test_Token_init_numbers() {
     }    
 }
 
-void test_Token_init_comments() {
+static void test_Token_init_comments() {
     Token token;
     const char* lexeme = "# Esto es un comentario";
 
@@ -577,6 +576,19 @@ void test_Token_init_comments() {
     TEST_ASSERT_EQUAL_INT(1, token.line);
     TEST_ASSERT_EQUAL_INT(1, token.column);
     Token_free(&token);
+}
+
+void test_Token_init() {
+    test_Token_init_EOF();
+    test_Token_init_unknown();
+    test_Token_init_error();
+    test_Token_init_one_char();
+    test_Token_init_one_or_two_chars();
+    test_Token_init_identifiers();
+    test_Token_init_keywords();
+    test_Token_init_strings();
+    test_Token_init_numbers();
+    test_Token_init_comments();
 }
 
 void test_Token_free() {

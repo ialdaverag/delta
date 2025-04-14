@@ -12,7 +12,7 @@ void test_Lexer_init() {
     TEST_ASSERT_EQUAL_INT(1, lexer.column);
 }
 
-void test_Lexer_position_tracking(void) {
+static void test_Lexer_position_tracking(void) {
     {
         // inicio
         Lexer lexer;
@@ -156,7 +156,7 @@ void test_Lexer_position_tracking(void) {
     }
 }
 
-void test_Lexer_EOF(void) {
+static void test_Lexer_next_token_EOF(void) {
     Lexer lexer;
     Lexer_init(&lexer, "");
 
@@ -168,7 +168,7 @@ void test_Lexer_EOF(void) {
     Token_free(&token);
 }
 
-void test_Lexer_unknown(void) {
+static void test_Lexer_next_token_unknown(void) {
     Lexer lexer;
     Lexer_init(&lexer, "!");
 
@@ -180,7 +180,7 @@ void test_Lexer_unknown(void) {
     Token_free(&token);
 }
 
-void test_Lexer_whitespace(void) {
+static void test_Lexer_next_token_whitespace(void) {
     {
         Lexer lexer;
         Lexer_init(&lexer, " ");
@@ -249,7 +249,7 @@ void test_Lexer_whitespace(void) {
     }
 }
 
-void test_Lexer_one_char_token(void) {
+static void test_Lexer_next_token_one_char_token(void) {
     {
         Lexer lexer;
         Lexer_init(&lexer, "+");
@@ -406,7 +406,7 @@ void test_Lexer_one_char_token(void) {
     }
 }
 
-void test_Lexer_one_or_two_char_token(void) {
+static void test_Lexer_next_token_one_or_two_char_token(void) {
     {
         Lexer lexer;
         Lexer_init(&lexer, "=");
@@ -486,7 +486,7 @@ void test_Lexer_one_or_two_char_token(void) {
     }
 }
 
-void test_Lexer_identifier(void) {
+static void test_Lexer_next_token_identifier(void) {
     {
         Lexer lexer;
         Lexer_init(&lexer, "variable");
@@ -566,7 +566,7 @@ void test_Lexer_identifier(void) {
     }
 }
 
-void test_Lexer_keyword(void) {
+static void test_Lexer_next_token_keyword(void) {
     {
         Lexer lexer;
         Lexer_init(&lexer, "var");
@@ -788,7 +788,7 @@ void test_Lexer_keyword(void) {
     }
 }
 
-void test_Lexer_number(void) {
+static void test_Lexer_next_token_number(void) {
     {
         Lexer lexer;
         Lexer_init(&lexer, "123");
@@ -854,7 +854,7 @@ void test_Lexer_number(void) {
     }
 }
 
-void test_Lexer_string(void) {
+static void test_Lexer_next_token_string(void) {
     {
         Lexer lexer;
         Lexer_init(&lexer, "\"Hello, World!\"");
@@ -941,7 +941,7 @@ void test_Lexer_string(void) {
     }
 }
 
-void test_Lexer_comment() {
+static void test_Lexer_next_token_comment() {
     {
         Lexer lexer;
         Lexer_init(&lexer, "#");
@@ -1098,4 +1098,18 @@ void test_Lexer_comment() {
         TEST_ASSERT_EQUAL_INT(35, token.column);
         Token_free(&token);
     }
+}
+
+void test_Lexer_next_token(void) {
+    test_Lexer_position_tracking();
+    test_Lexer_next_token_EOF();
+    test_Lexer_next_token_unknown();
+    test_Lexer_next_token_whitespace();
+    test_Lexer_next_token_one_char_token();
+    test_Lexer_next_token_one_or_two_char_token();
+    test_Lexer_next_token_identifier();
+    test_Lexer_next_token_keyword();
+    test_Lexer_next_token_number();
+    test_Lexer_next_token_string();
+    test_Lexer_next_token_comment();
 }
