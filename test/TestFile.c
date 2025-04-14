@@ -1,6 +1,6 @@
 #include "TestFile.h"
 
-void test_File_init_with_valid_file() {
+static void test_File_init_with_valid_file() {
     File file;
     const char* test_file = "test_valid.delta";
     
@@ -19,6 +19,10 @@ void test_File_init_with_valid_file() {
     // Limpieza
     File_free(&file);
     remove(test_file);
+}
+
+void test_File_init() {
+    test_File_init_with_valid_file();
 }
 
 void test_File_free() {

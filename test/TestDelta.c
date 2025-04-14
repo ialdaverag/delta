@@ -15,7 +15,7 @@ int main(void) {
     UNITY_BEGIN();
     
     // Tests para file.c
-    RUN_TEST(test_File_init_with_valid_file);
+    RUN_TEST(test_File_init);
     RUN_TEST(test_File_free);
 
     // Tests para token.c
