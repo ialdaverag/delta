@@ -76,13 +76,13 @@ typedef enum {
 
 typedef struct Token {
     TokenType type;
-    const char* start;
-    int length;
+    char* lexeme;
     int line;
     int column;
 } Token;
 
 Token Token_init(Token* token, TokenType type, const char* start, const char* current, int line, int column);
+void Token_free(Token* token);
 Token Token_print(Token token);
 
 #endif // TOKEN_H

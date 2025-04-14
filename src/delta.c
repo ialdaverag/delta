@@ -28,8 +28,10 @@ int main(int argc, const char* argv[]) {
     printf("\nTokens:\n");
     for (;;) {
         Token token = Lexer_next_token(&lexer);
-        Token_print(token);
-        
+        Token_print(token);  // Imprimir el token
+
+        Token_free(&token);
+
         if (token.type == TOKEN_EOF || token.type == TOKEN_ERROR) break;
     }
     
