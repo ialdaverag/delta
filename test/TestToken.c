@@ -1,244 +1,209 @@
 #include "TestToken.h"
 
 void test_Token_init_EOF() {
+    Token token;
     const char* lexeme = "\0";
 
-    Token token;
     Token_init(&token, TOKEN_EOF, lexeme, lexeme + strlen(lexeme), 1, 1);
-
     TEST_ASSERT_EQUAL(TOKEN_EOF, token.type);
     TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
     TEST_ASSERT_EQUAL_INT(1, token.line);
     TEST_ASSERT_EQUAL_INT(1, token.column);
-
     Token_free(&token);
 }
 
 void test_Token_init_unknown() {
+    Token token;
     const char* lexeme = "!";
 
-    Token token;
     Token_init(&token, TOKEN_UNKNOWN, lexeme, lexeme + strlen(lexeme), 1, 1);
-
     TEST_ASSERT_EQUAL(TOKEN_UNKNOWN, token.type);
     TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
     TEST_ASSERT_EQUAL_INT(1, token.line);
     TEST_ASSERT_EQUAL_INT(1, token.column);
-
-    TEST_ASSERT_NOT_NULL(token.lexeme);
+    Token_free(&token);
 }
 
 void test_Token_init_error() {
+    Token token;
     const char* lexeme = "error";
 
-    Token token;
     Token_init(&token, TOKEN_ERROR, lexeme, lexeme + strlen(lexeme), 1, 1);
-
     TEST_ASSERT_EQUAL(TOKEN_ERROR, token.type);
     TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
     TEST_ASSERT_EQUAL_INT(1, token.line);
     TEST_ASSERT_EQUAL_INT(1, token.column);
-
     TEST_ASSERT_NOT_NULL(token.lexeme);
+    Token_free(&token);
 }
 
 void test_Token_init_one_char() {
     {
+        Token token;
         const char* lexeme = "+";
 
-        Token token;
         Token_init(&token, TOKEN_PLUS, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_PLUS, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
+        Token token;
         const char* lexeme = "-";
 
-        Token token;
         Token_init(&token, TOKEN_MINUS, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_MINUS, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
+        Token token;
         const char* lexeme = "*";
 
-        Token token;
         Token_init(&token, TOKEN_STAR, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_STAR, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
+        Token token;
         const char* lexeme = "/";
 
-        Token token;
         Token_init(&token, TOKEN_SLASH, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_SLASH, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
+        Token token;
         const char* lexeme = "%";
 
-        Token token;
         Token_init(&token, TOKEN_PERCENT, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_PERCENT, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
+        Token token;
         const char* lexeme = "(";
 
-        Token token;
         Token_init(&token, TOKEN_LEFT_PARENTHESIS, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_LEFT_PARENTHESIS, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
-        const char* lexeme = ")";
-
         Token token;
+        const char* lexeme = ")";
+        
         Token_init(&token, TOKEN_RIGHT_PARENTHESIS, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_RIGHT_PARENTHESIS, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
+        Token token;
         const char* lexeme = "{";
 
-        Token token;
         Token_init(&token, TOKEN_LEFT_BRACE, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_LEFT_BRACE, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
+        Token token;
         const char* lexeme = "}";
 
-        Token token;
         Token_init(&token, TOKEN_RIGHT_BRACE, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_RIGHT_BRACE, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
+        Token token;
         const char* lexeme = "[";
 
-        Token token;
         Token_init(&token, TOKEN_LEFT_BRACKET, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_LEFT_BRACKET, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
+        Token token;
         const char* lexeme = "]";
 
-        Token token;
         Token_init(&token, TOKEN_RIGHT_BRACKET, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_RIGHT_BRACKET, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
+        Token token;
         const char* lexeme = ",";
 
-        Token token;
         Token_init(&token, TOKEN_COMMA, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_COMMA, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
+        Token token;
         const char* lexeme = ".";
 
-        Token token;
         Token_init(&token, TOKEN_DOT, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_DOT, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
+        Token token;
         const char* lexeme = ":";
 
-        Token token;
         Token_init(&token, TOKEN_COLON, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_COLON, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
 }
 
 void test_Token_init_one_or_two_chars() {
     {
+        Token token;
         const char* lexeme = "=";
 
-        Token token;
         Token_init(&token, TOKEN_EQUAL, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_EQUAL, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
@@ -339,16 +304,14 @@ void test_Token_init_identifiers() {
 
 void test_Token_init_keywords() {
     {
+        Token token;
         const char* lexeme = "var";
 
-        Token token;
         Token_init(&token, TOKEN_IDENTIFIER, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_IDENTIFIER, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
@@ -600,85 +563,72 @@ void test_Token_init_keywords() {
 
 void test_Token_init_strings() {
     {
+        Token token;
         const char* lexeme = "\"Hola, mundo!\"";
 
-        Token token;
         Token_init(&token, TOKEN_STRING, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_STRING, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
+        Token token;
         const char* lexeme = "'Hola, mundo!'";
 
-        Token token;
         Token_init(&token, TOKEN_STRING, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_STRING, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
 }
 
 void test_Token_init_numbers() {
     {
+        Token token;
         const char* lexeme = "123";
 
-        Token token;
         Token_init(&token, TOKEN_INTEGER, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_INTEGER, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }
     {
+        Token token;
         const char* lexeme = "3.1415";
 
-        Token token;
         Token_init(&token, TOKEN_FLOAT, lexeme, lexeme + strlen(lexeme), 1, 1);
-
         TEST_ASSERT_EQUAL(TOKEN_FLOAT, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
         Token_free(&token);
     }    
 }
 
 void test_Token_init_comments() {
+    Token token;
     const char* lexeme = "# Esto es un comentario";
 
-    Token token;
     Token_init(&token, TOKEN_COMMENT, lexeme, lexeme + strlen(lexeme), 1, 1);
-
     TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
     TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
     TEST_ASSERT_EQUAL_INT(1, token.line);
     TEST_ASSERT_EQUAL_INT(1, token.column);
-
     Token_free(&token);
 }
 
 void test_Token_free() {
+    Token token;
     const char* lexeme = "var1";
 
-    Token token;
     Token_init(&token, TOKEN_IDENTIFIER, lexeme, lexeme + strlen(lexeme), 1, 1);
-
     TEST_ASSERT_NOT_NULL(token.lexeme);
-
     Token_free(&token);
-
     TEST_ASSERT_NULL(token.lexeme);
 }

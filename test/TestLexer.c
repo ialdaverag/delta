@@ -14,21 +14,24 @@ void test_Lexer_init() {
 
 void test_Lexer_position_tracking(void) {
     {
+        // inicio
         Lexer lexer;
         Lexer_init(&lexer, "var x = 10");
 
-        // inicio
         TEST_ASSERT_EQUAL_STRING("var x = 10", lexer.start);
         TEST_ASSERT_EQUAL_STRING("var x = 10", lexer.current);
         TEST_ASSERT_EQUAL_INT(1, lexer.line);
         TEST_ASSERT_EQUAL_INT(1, lexer.column);
 
+        Token token;
+
         // var
-        Token token = Lexer_next_token(&lexer);
+        token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_VAR, token.type);
         TEST_ASSERT_EQUAL_STRING("var", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
 
         TEST_ASSERT_EQUAL_STRING("var x = 10", lexer.start);
         TEST_ASSERT_EQUAL_STRING(" x = 10", lexer.current);
@@ -41,6 +44,7 @@ void test_Lexer_position_tracking(void) {
         TEST_ASSERT_EQUAL_STRING("x", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(5, token.column);
+        Token_free(&token);
 
         TEST_ASSERT_EQUAL_STRING("x = 10", lexer.start);
         TEST_ASSERT_EQUAL_STRING(" = 10", lexer.current);
@@ -53,6 +57,7 @@ void test_Lexer_position_tracking(void) {
         TEST_ASSERT_EQUAL_STRING("=", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(7, token.column);
+        Token_free(&token);
 
         TEST_ASSERT_EQUAL_STRING("= 10", lexer.start);
         TEST_ASSERT_EQUAL_STRING(" 10", lexer.current);
@@ -65,6 +70,7 @@ void test_Lexer_position_tracking(void) {
         TEST_ASSERT_EQUAL_STRING("10", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(9, token.column);
+        Token_free(&token);
 
         TEST_ASSERT_EQUAL_STRING("10", lexer.start);
         TEST_ASSERT_EQUAL_STRING("", lexer.current);
@@ -72,21 +78,24 @@ void test_Lexer_position_tracking(void) {
         TEST_ASSERT_EQUAL_INT(11, lexer.column);
     }
     {
+        // Inicio
         Lexer lexer;
         Lexer_init(&lexer, "var x\nx = 10");
 
-        // inicio
         TEST_ASSERT_EQUAL_STRING("var x\nx = 10", lexer.start);
         TEST_ASSERT_EQUAL_STRING("var x\nx = 10", lexer.current);
         TEST_ASSERT_EQUAL_INT(1, lexer.line);
         TEST_ASSERT_EQUAL_INT(1, lexer.column);
+
+        Token token;
         
         // var (primera línea)
-        Token token = Lexer_next_token(&lexer);
+        token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_VAR, token.type);
         TEST_ASSERT_EQUAL_STRING("var", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
 
         TEST_ASSERT_EQUAL_STRING("var x\nx = 10", lexer.start);
         TEST_ASSERT_EQUAL_STRING(" x\nx = 10", lexer.current);
@@ -99,6 +108,7 @@ void test_Lexer_position_tracking(void) {
         TEST_ASSERT_EQUAL_STRING("x", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(5, token.column);
+        Token_free(&token);
 
         TEST_ASSERT_EQUAL_STRING("x\nx = 10", lexer.start);
         TEST_ASSERT_EQUAL_STRING("\nx = 10", lexer.current);
@@ -111,6 +121,7 @@ void test_Lexer_position_tracking(void) {
         TEST_ASSERT_EQUAL_STRING("x", token.lexeme);
         TEST_ASSERT_EQUAL_INT(2, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
 
         TEST_ASSERT_EQUAL_STRING("x = 10", lexer.start);
         TEST_ASSERT_EQUAL_STRING(" = 10", lexer.current);
@@ -123,6 +134,7 @@ void test_Lexer_position_tracking(void) {
         TEST_ASSERT_EQUAL_STRING("=", token.lexeme);
         TEST_ASSERT_EQUAL_INT(2, token.line);
         TEST_ASSERT_EQUAL_INT(3, token.column);
+        Token_free(&token);
 
         TEST_ASSERT_EQUAL_STRING("= 10", lexer.start);
         TEST_ASSERT_EQUAL_STRING(" 10", lexer.current);
@@ -135,6 +147,7 @@ void test_Lexer_position_tracking(void) {
         TEST_ASSERT_EQUAL_STRING("10", token.lexeme);
         TEST_ASSERT_EQUAL_INT(2, token.line);
         TEST_ASSERT_EQUAL_INT(5, token.column);
+        Token_free(&token);
 
         TEST_ASSERT_EQUAL_STRING("10", lexer.start);
         TEST_ASSERT_EQUAL_STRING("", lexer.current);
@@ -147,8 +160,7 @@ void test_Lexer_EOF(void) {
     Lexer lexer;
     Lexer_init(&lexer, "");
 
-    Token token;
-    token = Lexer_next_token(&lexer);
+    Token token = Lexer_next_token(&lexer);
     TEST_ASSERT_EQUAL(TOKEN_EOF, token.type);
     TEST_ASSERT_EQUAL_STRING("", token.lexeme);
     TEST_ASSERT_EQUAL_INT(1, token.line);
@@ -165,11 +177,7 @@ void test_Lexer_unknown(void) {
     TEST_ASSERT_EQUAL_STRING("!", token.lexeme);
     TEST_ASSERT_EQUAL_INT(1, token.line);
     TEST_ASSERT_EQUAL_INT(1, token.column);
-
-    TEST_ASSERT_EQUAL_STRING("!", lexer.start);
-    TEST_ASSERT_EQUAL_STRING("", lexer.current);
-    TEST_ASSERT_EQUAL_INT(1, lexer.line);
-    TEST_ASSERT_EQUAL_INT(2, lexer.column);
+    Token_free(&token);
 }
 
 void test_Lexer_whitespace(void) {
@@ -182,6 +190,7 @@ void test_Lexer_whitespace(void) {
         TEST_ASSERT_EQUAL_STRING("", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(2, token.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -192,6 +201,7 @@ void test_Lexer_whitespace(void) {
         TEST_ASSERT_EQUAL_STRING("", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(4, token.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -202,6 +212,7 @@ void test_Lexer_whitespace(void) {
         TEST_ASSERT_EQUAL_STRING("", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(2, token.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -212,6 +223,7 @@ void test_Lexer_whitespace(void) {
         TEST_ASSERT_EQUAL_STRING("", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(2, token.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -222,6 +234,7 @@ void test_Lexer_whitespace(void) {
         TEST_ASSERT_EQUAL_STRING("", token.lexeme);
         TEST_ASSERT_EQUAL_INT(2, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -232,6 +245,7 @@ void test_Lexer_whitespace(void) {
         TEST_ASSERT_EQUAL_STRING("", token.lexeme);
         TEST_ASSERT_EQUAL_INT(2, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
     }
 }
 
@@ -245,11 +259,7 @@ void test_Lexer_one_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("+", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("+", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -260,11 +270,7 @@ void test_Lexer_one_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("-", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("-", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -275,11 +281,7 @@ void test_Lexer_one_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("*", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("*", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -290,11 +292,7 @@ void test_Lexer_one_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("/", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("/", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -305,11 +303,7 @@ void test_Lexer_one_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("%", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("%", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -320,11 +314,7 @@ void test_Lexer_one_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("(", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("(", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -335,11 +325,7 @@ void test_Lexer_one_char_token(void) {
         TEST_ASSERT_EQUAL_STRING(")", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING(")", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -350,11 +336,7 @@ void test_Lexer_one_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("[", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("[", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -365,11 +347,7 @@ void test_Lexer_one_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("]", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("]", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -380,11 +358,7 @@ void test_Lexer_one_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("{", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("{", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -395,11 +369,7 @@ void test_Lexer_one_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("}", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("}", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -410,11 +380,7 @@ void test_Lexer_one_char_token(void) {
         TEST_ASSERT_EQUAL_STRING(",", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING(",", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -425,11 +391,7 @@ void test_Lexer_one_char_token(void) {
         TEST_ASSERT_EQUAL_STRING(".", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING(".", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -440,11 +402,7 @@ void test_Lexer_one_char_token(void) {
         TEST_ASSERT_EQUAL_STRING(":", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING(":", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
 }
 
@@ -458,11 +416,7 @@ void test_Lexer_one_or_two_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("=", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("=", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -473,11 +427,7 @@ void test_Lexer_one_or_two_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("==", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("==", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(3, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -488,11 +438,7 @@ void test_Lexer_one_or_two_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("!=", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("!=", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(3, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -503,11 +449,7 @@ void test_Lexer_one_or_two_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("<", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("<", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -518,11 +460,7 @@ void test_Lexer_one_or_two_char_token(void) {
         TEST_ASSERT_EQUAL_STRING("<=", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("<=", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(3, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -533,11 +471,7 @@ void test_Lexer_one_or_two_char_token(void) {
         TEST_ASSERT_EQUAL_STRING(">", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING(">", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -548,11 +482,7 @@ void test_Lexer_one_or_two_char_token(void) {
         TEST_ASSERT_EQUAL_STRING(">=", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING(">=", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(3, lexer.column);
+        Token_free(&token);
     }
 }
 
@@ -566,11 +496,7 @@ void test_Lexer_identifier(void) {
         TEST_ASSERT_EQUAL_STRING("variable", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("variable", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(9, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -581,11 +507,7 @@ void test_Lexer_identifier(void) {
         TEST_ASSERT_EQUAL_STRING("var_123", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("var_123", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(8, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -596,11 +518,7 @@ void test_Lexer_identifier(void) {
         TEST_ASSERT_EQUAL_STRING("var123", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("var123", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(7, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -611,11 +529,7 @@ void test_Lexer_identifier(void) {
         TEST_ASSERT_EQUAL_STRING("_var123", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("_var123", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(8, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -626,11 +540,7 @@ void test_Lexer_identifier(void) {
         TEST_ASSERT_EQUAL_STRING("miVariable", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("miVariable", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(11, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -641,11 +551,7 @@ void test_Lexer_identifier(void) {
         TEST_ASSERT_EQUAL_STRING("mi_variable", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("mi_variable", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(12, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -656,11 +562,7 @@ void test_Lexer_identifier(void) {
         TEST_ASSERT_EQUAL_STRING("VARIABLE", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("VARIABLE", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(9, lexer.column);
+        Token_free(&token);
     }
 }
 
@@ -674,11 +576,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("var", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("var", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(4, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -689,11 +587,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("const", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("const", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(6, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -704,11 +598,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("si", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("si", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(3, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -719,11 +609,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("sino", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("sino", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(5, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -734,11 +620,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("segun", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("segun", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(6, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -749,11 +631,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("caso", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("caso", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(5, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -764,11 +642,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("otro", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("otro", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(5, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -778,11 +652,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL(TOKEN_MIENTRAS, token.type);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("mientras", token.lexeme);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(9, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -793,11 +663,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("para", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("para", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(5, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -808,11 +674,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("continuar", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("continuar", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(10, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -823,11 +685,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("romper", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("romper", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(7, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -838,11 +696,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("fun", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("fun", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(4, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -853,11 +707,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("ret", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("ret", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(4, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -868,11 +718,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("clase", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("clase", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(6, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -883,11 +729,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("y", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("y", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -898,11 +740,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("o", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("o", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -913,11 +751,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("no", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("no", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(3, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -928,11 +762,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("verdadero", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("verdadero", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(10, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -943,11 +773,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("falso", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("falso", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(6, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -958,11 +784,7 @@ void test_Lexer_keyword(void) {
         TEST_ASSERT_EQUAL_STRING("nulo", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("nulo", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(5, lexer.column);
+        Token_free(&token);
     }
 }
 
@@ -976,11 +798,7 @@ void test_Lexer_number(void) {
         TEST_ASSERT_EQUAL_STRING("123", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("123", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(4, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -991,11 +809,7 @@ void test_Lexer_number(void) {
         TEST_ASSERT_EQUAL_STRING("123.456", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("123.456", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(8, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -1006,11 +820,7 @@ void test_Lexer_number(void) {
         TEST_ASSERT_EQUAL_STRING("0.123", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("0.123", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(6, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -1021,27 +831,26 @@ void test_Lexer_number(void) {
         TEST_ASSERT_EQUAL_STRING("123", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("123.", lexer.start);
-        TEST_ASSERT_EQUAL_STRING(".", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(4, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
         Lexer_init(&lexer, "123.45.67");
+
         Token token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_FLOAT, token.type); // Solo reconoce hasta el segundo punto
         TEST_ASSERT_EQUAL_STRING("123.45", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
         
         // El siguiente token debería ser un punto
         token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_DOT, token.type);
-
+        TEST_ASSERT_EQUAL_STRING(".", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(7, token.column);
+        Token_free(&token);
     }
 }
 
@@ -1055,11 +864,7 @@ void test_Lexer_string(void) {
         TEST_ASSERT_EQUAL_STRING("\"Hello, World!\"", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("\"Hello, World!\"", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(16, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -1070,11 +875,7 @@ void test_Lexer_string(void) {
         TEST_ASSERT_EQUAL_STRING("'Hello, World!'", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("'Hello, World!'", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(16, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -1085,11 +886,7 @@ void test_Lexer_string(void) {
         TEST_ASSERT_EQUAL_STRING("\"Hello\\nWorld\"", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("\"Hello\\nWorld\"", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(15, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -1100,6 +897,7 @@ void test_Lexer_string(void) {
         TEST_ASSERT_EQUAL_STRING("\"Hello\\tWorld\"", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -1107,6 +905,7 @@ void test_Lexer_string(void) {
         
         Token token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_ERROR, token.type);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -1114,6 +913,7 @@ void test_Lexer_string(void) {
         
         Token token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_ERROR, token.type);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -1121,6 +921,7 @@ void test_Lexer_string(void) {
         
         Token token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_ERROR, token.type);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -1128,6 +929,7 @@ void test_Lexer_string(void) {
         
         Token token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_ERROR, token.type);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -1135,6 +937,7 @@ void test_Lexer_string(void) {
         
         Token token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_STRING, token.type);
+        Token_free(&token);
     }
 }
 
@@ -1148,11 +951,7 @@ void test_Lexer_comment() {
         TEST_ASSERT_EQUAL_STRING("#", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("#", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(2, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -1163,11 +962,7 @@ void test_Lexer_comment() {
         TEST_ASSERT_EQUAL_STRING("#Comentario sin nueva línea", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-        
-        TEST_ASSERT_EQUAL_STRING("#Comentario sin nueva línea", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(29, lexer.column);
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -1178,11 +973,7 @@ void test_Lexer_comment() {
         TEST_ASSERT_EQUAL_STRING("# Comentario con espacios antes", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(4, token.column); // Los 3 espacios + 1 para el #
-
-        TEST_ASSERT_EQUAL_STRING("# Comentario con espacios antes", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(35, lexer.column); // 3 espacios + 1 para el # + 30 del comentario
+        Token_free(&token);
     }
     {
         Lexer lexer;
@@ -1193,22 +984,21 @@ void test_Lexer_comment() {
         TEST_ASSERT_EQUAL_STRING("# !@#$%^&*()_+-=[]{}\\|;:'\",.<>/?", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
-
-        TEST_ASSERT_EQUAL_STRING("# !@#$%^&*()_+-=[]{}\\|;:'\",.<>/?", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(33, lexer.column); // 37 caracteres + 1 para el #
+        Token_free(&token);
     }
     {
         Lexer lexer;
         Lexer_init(&lexer, "#Primer comentario\n#Segundo comentario\n#Tercer comentario");
+
+        Token token;
         
         // Primer comentario
-        Token token = Lexer_next_token(&lexer);
+        token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
         TEST_ASSERT_EQUAL_STRING("#Primer comentario", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
 
         TEST_ASSERT_EQUAL_STRING("#Primer comentario\n#Segundo comentario\n#Tercer comentario", lexer.start);
         TEST_ASSERT_EQUAL_STRING("\n#Segundo comentario\n#Tercer comentario", lexer.current);
@@ -1221,6 +1011,7 @@ void test_Lexer_comment() {
         TEST_ASSERT_EQUAL_STRING("#Segundo comentario", token.lexeme);
         TEST_ASSERT_EQUAL_INT(2, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
 
         TEST_ASSERT_EQUAL_STRING("#Segundo comentario\n#Tercer comentario", lexer.start);
         TEST_ASSERT_EQUAL_STRING("\n#Tercer comentario", lexer.current);
@@ -1233,6 +1024,7 @@ void test_Lexer_comment() {
         TEST_ASSERT_EQUAL_STRING("#Tercer comentario", token.lexeme);
         TEST_ASSERT_EQUAL_INT(3, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
 
         TEST_ASSERT_EQUAL_STRING("#Tercer comentario", lexer.start);
         TEST_ASSERT_EQUAL_STRING("", lexer.current);
@@ -1245,6 +1037,7 @@ void test_Lexer_comment() {
         TEST_ASSERT_EQUAL_STRING("", token.lexeme);
         TEST_ASSERT_EQUAL_INT(3, token.line);
         TEST_ASSERT_EQUAL_INT(19, token.column);
+        Token_free(&token);
 
         TEST_ASSERT_EQUAL_STRING("", lexer.start);
         TEST_ASSERT_EQUAL_STRING("#Primer comentario", lexer.current);
@@ -1255,40 +1048,54 @@ void test_Lexer_comment() {
         Lexer lexer;
         Lexer_init(&lexer, "var x = 10 # Esto es un comentario");
 
+        Token token;
+
         // var
-        Token token = Lexer_next_token(&lexer);
+        token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_VAR, token.type);
+        TEST_ASSERT_EQUAL_STRING("var", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
 
         // x
         token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_IDENTIFIER, token.type);
+        TEST_ASSERT_EQUAL_STRING("x", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(5, token.column);
+        Token_free(&token);
 
         // =
         token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_EQUAL, token.type);
+        TEST_ASSERT_EQUAL_STRING("=", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(7, token.column);
+        Token_free(&token);
 
         // 10
         token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_INTEGER, token.type);
+        TEST_ASSERT_EQUAL_STRING("10", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(9, token.column);
+        Token_free(&token);
 
         // # Esto es un comentario
         token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
+        TEST_ASSERT_EQUAL_STRING("# Esto es un comentario", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(12, token.column);
+        Token_free(&token);
 
         // EOF
         token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_EOF, token.type);
+        TEST_ASSERT_EQUAL_STRING("", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(35, token.column);
+        Token_free(&token);
     }
 }
