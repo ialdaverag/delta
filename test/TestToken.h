@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "unity.h"
-#include "../src/token.h"
+#include "Token.h"
 
 void test_Token_init_EOF(void);
 void test_Token_init_unknown(void);
