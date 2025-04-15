@@ -11,7 +11,7 @@ static bool is_at_end(Lexer* lexer) {
     return *lexer->current == '\0';
 }
 
-char advance(Lexer* lexer) {
+static char advance(Lexer* lexer) {
     char c = *lexer->current++;
 
     if (c == '\n') {
@@ -193,19 +193,27 @@ static Token identifier(Lexer* lexer) {
 }
 
 static Token number(Lexer* lexer) {
+    const char* start = lexer->current - 1;
+    bool has_decimal = false;
+
     while (is_digit(peek(lexer)))
         advance(lexer);
-    
+
     if (peek(lexer) == '.' && is_digit(peek_next(lexer))) {
+        has_decimal = true;
         advance(lexer);
-        
+
         while (is_digit(peek(lexer)))
             advance(lexer);
-        
-        return make_token(lexer, TOKEN_FLOAT);
     }
-    
-    return make_token(lexer, TOKEN_INTEGER);
+
+    if (peek(lexer) == '.') {
+        lexer->current = start;
+
+        return error_token(lexer, "ERROR: Numero mal formado.");
+    }
+
+    return make_token(lexer, has_decimal ? TOKEN_FLOAT : TOKEN_INTEGER);
 }
 
 static Token string(Lexer* lexer) {

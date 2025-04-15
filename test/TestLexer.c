@@ -827,10 +827,10 @@ static void test_Lexer_next_token_number(void) {
         Lexer_init(&lexer, "123.");
 
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_INTEGER, token.type);
-        TEST_ASSERT_EQUAL_STRING("123", token.lexeme);
+        TEST_ASSERT_EQUAL(TOKEN_ERROR, token.type);
+        TEST_ASSERT_EQUAL_STRING("ERROR: Numero mal formado.", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
+        TEST_ASSERT_EQUAL_INT(4, token.column); // Donde detectó el error
         Token_free(&token);
     }
     {
@@ -838,18 +838,10 @@ static void test_Lexer_next_token_number(void) {
         Lexer_init(&lexer, "123.45.67");
 
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_FLOAT, token.type); // Solo reconoce hasta el segundo punto
-        TEST_ASSERT_EQUAL_STRING("123.45", token.lexeme);
+        TEST_ASSERT_EQUAL(TOKEN_ERROR, token.type);
+        TEST_ASSERT_EQUAL_STRING("ERROR: Numero mal formado.", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
-        Token_free(&token);
-        
-        // El siguiente token debería ser un punto
-        token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_DOT, token.type);
-        TEST_ASSERT_EQUAL_STRING(".", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(7, token.column);
+        TEST_ASSERT_EQUAL_INT(7, token.column); // Donde detectó el error
         Token_free(&token);
     }
 }
