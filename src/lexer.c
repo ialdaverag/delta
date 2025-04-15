@@ -5,6 +5,11 @@ void Lexer_init(Lexer* lexer, const char* source) {
     lexer->current = source;
     lexer->line = 1;
     lexer->column = 1;
+
+    lexer->indent_stack[0] = 0;
+    lexer->indent_top = 0;
+    lexer->at_line_start = true;
+    lexer->pendin = 0;
 }
 
 static bool is_at_end(Lexer* lexer) {
@@ -14,15 +19,25 @@ static bool is_at_end(Lexer* lexer) {
 static char advance(Lexer* lexer) {
     char c = *lexer->current++;
 
-    if (c == '\n') {
+    if (c == '\r') {
+        // Si el siguiente carácter es '\n', es un salto de línea de Windows
+        if (*lexer->current == '\n')
+            lexer->current++; // Consumimos el '\n'
+
         lexer->line++;
         lexer->column = 1;
+
+        return '\n'; // Normalizamos a \n
+    } else if (c == '\n') {
+        lexer->line++;
+        lexer->column = 1;
+        return '\n';
     } else {
         lexer->column++;
+        return c;
     }
-
-    return c;
 }
+
 
 static char peek(Lexer* lexer) {
     return *lexer->current;

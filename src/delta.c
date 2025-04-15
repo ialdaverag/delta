@@ -17,6 +17,20 @@ int main(int argc, const char* argv[]) {
     printf("Contenido del archivo:\n%s\n", file.content);
     printf("Longitud del archivo: %ld bytes\n", file.length);
 
+    printf("Bytes del archivo (alrededor de la línea 2):\n");
+    for (int i = 0; file.content[i] != '\0'; i++) {
+        printf("%c (%d) ", file.content[i], (int)file.content[i]);
+        if (file.content[i] == '\n') {
+            printf("\n");
+            // Imprime algunos bytes más después de la newline
+            for (int j = i + 1; j < i + 20 && file.content[j] != '\0'; j++) {
+                printf("%c (%d) ", file.content[j], (int)file.content[j]);
+            }
+            break; // Detener después de inspeccionar la segunda línea
+        }
+    }
+    printf("\n");
+
     Lexer lexer;
     Lexer_init(&lexer, file.content);
 

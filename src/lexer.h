@@ -5,11 +5,18 @@
 #include <string.h> 
 #include "token.h" 
 
+#define MAXINDENT 100
+
 typedef struct {
     const char* start;
     const char* current;
     int line;
     int column;
+
+    int indent_stack[MAXINDENT];
+    int indent_top;
+    bool at_line_start;
+    int pendin;
 } Lexer;
 
 void Lexer_init(Lexer* lexer, const char* source);

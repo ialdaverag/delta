@@ -198,8 +198,8 @@ static void test_Lexer_next_token_whitespace(void) {
         Token token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_EOF, token.type);
         TEST_ASSERT_EQUAL_STRING("", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(2, token.column);
+        TEST_ASSERT_EQUAL_INT(2, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
     }
     {
@@ -231,7 +231,7 @@ static void test_Lexer_next_token_whitespace(void) {
         Token token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_EOF, token.type);
         TEST_ASSERT_EQUAL_STRING("", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(2, token.line);
+        TEST_ASSERT_EQUAL_INT(3, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
     }
