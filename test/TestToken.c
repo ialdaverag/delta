@@ -12,18 +12,6 @@ static void test_Token_init_EOF() {
     Token_free(&token);
 }
 
-static void test_Token_init_unknown() {
-    Token token;
-    const char* lexeme = "!";
-
-    Token_init(&token, TOKEN_UNKNOWN, lexeme, lexeme + strlen(lexeme), 1, 1);
-    TEST_ASSERT_EQUAL(TOKEN_UNKNOWN, token.type);
-    TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
-    TEST_ASSERT_EQUAL_INT(1, token.line);
-    TEST_ASSERT_EQUAL_INT(1, token.column);
-    Token_free(&token);
-}
-
 static void test_Token_init_error() {
     Token token;
     const char* lexeme = "error";
@@ -218,10 +206,32 @@ static void test_Token_init_one_or_two_chars() {
     }
     {
         Token token;
+        const char* lexeme = "!";
+
+        Token_init(&token, TOKEN_ERROR, lexeme, lexeme + strlen(lexeme), 1, 1);
+        TEST_ASSERT_EQUAL(TOKEN_ERROR, token.type);
+        TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+    {
+        Token token;
         const char* lexeme = "!=";
 
         Token_init(&token, TOKEN_BANG_EQUAL, lexeme, lexeme + strlen(lexeme), 1, 1);
         TEST_ASSERT_EQUAL(TOKEN_BANG_EQUAL, token.type);
+        TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+    {
+        Token token;
+        const char* lexeme = "<";
+
+        Token_init(&token, TOKEN_LESS, lexeme, lexeme + strlen(lexeme), 1, 1);
+        TEST_ASSERT_EQUAL(TOKEN_LESS, token.type);
         TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
@@ -240,6 +250,17 @@ static void test_Token_init_one_or_two_chars() {
     }
     {
         Token token;
+        const char* lexeme = ">";
+
+        Token_init(&token, TOKEN_GREATER, lexeme, lexeme + strlen(lexeme), 1, 1);
+        TEST_ASSERT_EQUAL(TOKEN_GREATER, token.type);
+        TEST_ASSERT_EQUAL_STRING(lexeme, token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+    {
+        Token token;
         const char* lexeme = ">=";
 
         Token_init(&token, TOKEN_GREATER_EQUAL, lexeme, lexeme + strlen(lexeme), 1, 1);
@@ -251,7 +272,7 @@ static void test_Token_init_one_or_two_chars() {
     }
 }
 
-static void test_Token_init_identifiers() {
+static void test_Token_init_identifier() {
     {
         const char* lexeme = "var1";
 
@@ -293,7 +314,7 @@ static void test_Token_init_identifiers() {
     }
 }
 
-static void test_Token_init_keywords() {
+static void test_Token_init_keyword() {
     {
         Token token;
         const char* lexeme = "var";
@@ -516,7 +537,7 @@ static void test_Token_init_keywords() {
     }
 }
 
-static void test_Token_init_strings() {
+static void test_Token_init_string() {
     {
         Token token;
         const char* lexeme = "\"Hola, mundo!\"";
@@ -541,7 +562,7 @@ static void test_Token_init_strings() {
     }
 }
 
-static void test_Token_init_numbers() {
+static void test_Token_init_number() {
     {
         Token token;
         const char* lexeme = "123";
@@ -566,7 +587,7 @@ static void test_Token_init_numbers() {
     }    
 }
 
-static void test_Token_init_comments() {
+static void test_Token_init_comment() {
     Token token;
     const char* lexeme = "# Esto es un comentario";
 
@@ -580,15 +601,14 @@ static void test_Token_init_comments() {
 
 void test_Token_init() {
     test_Token_init_EOF();
-    test_Token_init_unknown();
     test_Token_init_error();
     test_Token_init_one_char();
     test_Token_init_one_or_two_chars();
-    test_Token_init_identifiers();
-    test_Token_init_keywords();
-    test_Token_init_strings();
-    test_Token_init_numbers();
-    test_Token_init_comments();
+    test_Token_init_identifier();
+    test_Token_init_keyword();
+    test_Token_init_string();
+    test_Token_init_number();
+    test_Token_init_comment();
 }
 
 void test_Token_free() {

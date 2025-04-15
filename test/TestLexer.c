@@ -168,18 +168,6 @@ static void test_Lexer_next_token_EOF(void) {
     Token_free(&token);
 }
 
-static void test_Lexer_next_token_unknown(void) {
-    Lexer lexer;
-    Lexer_init(&lexer, "!");
-
-    Token token = Lexer_next_token(&lexer);
-    TEST_ASSERT_EQUAL(TOKEN_UNKNOWN, token.type);
-    TEST_ASSERT_EQUAL_STRING("!", token.lexeme);
-    TEST_ASSERT_EQUAL_INT(1, token.line);
-    TEST_ASSERT_EQUAL_INT(1, token.column);
-    Token_free(&token);
-}
-
 static void test_Lexer_next_token_whitespace(void) {
     {
         Lexer lexer;
@@ -406,7 +394,7 @@ static void test_Lexer_next_token_one_char_token(void) {
     }
 }
 
-static void test_Lexer_next_token_one_or_two_char_token(void) {
+static void test_Lexer_next_token_one_or_two_chars_token(void) {
     {
         Lexer lexer;
         Lexer_init(&lexer, "=");
@@ -425,6 +413,17 @@ static void test_Lexer_next_token_one_or_two_char_token(void) {
         Token token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_EQUAL_EQUAL, token.type);
         TEST_ASSERT_EQUAL_STRING("==", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "!");
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_ERROR, token.type);
+        TEST_ASSERT_EQUAL_STRING("!", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
@@ -1095,10 +1094,9 @@ static void test_Lexer_next_token_comment() {
 void test_Lexer_next_token(void) {
     test_Lexer_position_tracking();
     test_Lexer_next_token_EOF();
-    test_Lexer_next_token_unknown();
     test_Lexer_next_token_whitespace();
     test_Lexer_next_token_one_char_token();
-    test_Lexer_next_token_one_or_two_char_token();
+    test_Lexer_next_token_one_or_two_chars_token();
     test_Lexer_next_token_identifier();
     test_Lexer_next_token_keyword();
     test_Lexer_next_token_number();

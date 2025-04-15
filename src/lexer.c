@@ -268,10 +268,10 @@ Token Lexer_next_token(Lexer* lexer) {
 
         // Two character tokens
         case '=': return make_token(lexer, match(lexer, '=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
-        case '!': return make_token(lexer, match(lexer, '=') ? TOKEN_BANG_EQUAL : TOKEN_UNKNOWN);
+        case '!': return make_token(lexer, match(lexer, '=') ? TOKEN_BANG_EQUAL : TOKEN_ERROR);
         case '<': return make_token(lexer, match(lexer, '=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
         case '>': return make_token(lexer, match(lexer, '=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
     }
 
-    return make_token(lexer, TOKEN_UNKNOWN);
+    return make_token(lexer, TOKEN_ERROR);
 }

@@ -64,9 +64,6 @@ typedef enum {
     // Comentario
     TOKEN_COMMENT, // #.*
 
-    // Desconocido
-    TOKEN_UNKNOWN, // Caracter desconocido
-
     // Errores
     TOKEN_ERROR, // Error de análisis
 
