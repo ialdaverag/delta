@@ -5,11 +5,6 @@ void Lexer_init(Lexer* lexer, const char* source) {
     lexer->current = source;
     lexer->line = 1;
     lexer->column = 1;
-
-    lexer->indent_stack[0] = 0;
-    lexer->indent_top = 0;
-    lexer->at_line_start = true;
-    lexer->pendin = 0;
 }
 
 static bool is_at_end(Lexer* lexer) {
@@ -20,32 +15,34 @@ static char advance(Lexer* lexer) {
     char c = *lexer->current++;
 
     if (c == '\r') {
-        // Si el siguiente carácter es '\n', es un salto de línea de Windows
-        if (*lexer->current == '\n')
-            lexer->current++; // Consumimos el '\n'
+        if (*lexer->current == '\n') {
+            lexer->current++;
+        }
 
         lexer->line++;
         lexer->column = 1;
 
-        return '\n'; // Normalizamos a \n
+        return '\n';
     } else if (c == '\n') {
         lexer->line++;
         lexer->column = 1;
+
         return '\n';
     } else {
         lexer->column++;
+
         return c;
     }
 }
-
 
 static char peek(Lexer* lexer) {
     return *lexer->current;
 }
 
 static char peek_next(Lexer* lexer) {
-    if (is_at_end(lexer)) 
+    if (is_at_end(lexer)) {
         return '\0';
+    }
 
     return lexer->current[1];
 }
@@ -69,6 +66,21 @@ static void skip_whitespace(Lexer* lexer) {
     }
 }
 
+static bool match(Lexer* lexer, char expected) {
+    if (is_at_end(lexer)) {
+        return false;
+    }
+
+    if (*lexer->current != expected) {
+        return false;
+    }
+
+    lexer->current++;
+    lexer->column++;
+    
+    return true;
+}
+
 static bool is_hash(char c) {
     return c == '#';
 }
@@ -88,38 +100,22 @@ static bool is_digit(char c) {
 }
 
 static bool is_quote(char c) {
-    return c == '"' || c == '\'';
-}
-
-static bool match(Lexer* lexer, char expected) {
-    if (is_at_end(lexer)) 
-        return false;
-
-    if (*lexer->current != expected) 
-        return false;
-
-    lexer->current++;
-    lexer->column++;
-    
-    return true;
+    return c == '\'' || c == '"' ;
 }
 
 static Token make_token(Lexer* lexer, TokenType type) {
     Token token;
-    int length = (int)(lexer->current - lexer->start);
-
     Token_init(
         &token,
         type,
         lexer->start,
         lexer->current,
         lexer->line,
-        lexer->column - length
+        lexer->column - (int)(lexer->current - lexer->start)
     );
 
     return token;
 }
-
 
 static Token error_token(Lexer* lexer, const char* message) {
     Token token;
@@ -136,7 +132,8 @@ static Token error_token(Lexer* lexer, const char* message) {
 }
 
 static bool is_keyword(Lexer* lexer, int length, int offset, const char* keyword, int keyword_length) {
-    return (lexer->current - lexer->start == length) && (memcmp(lexer->start + offset, keyword, keyword_length) == 0);
+    return (lexer->current - lexer->start == length) && 
+           (memcmp(lexer->start + offset, keyword, keyword_length) == 0);
 }
 
 static TokenType identifier_type(Lexer* lexer) {
@@ -144,44 +141,123 @@ static TokenType identifier_type(Lexer* lexer) {
 
     switch (lexer->start[0]) {
         case 'c':
-            if (is_keyword(lexer, 4, 1, "aso", 3)) return TOKEN_CASO;
-            if (is_keyword(lexer, 5, 1, "lase", 4)) return TOKEN_CLASE;
-            if (is_keyword(lexer, 5, 1, "onst", 4)) return TOKEN_CONST;
-            if (is_keyword(lexer, 9, 1, "ontinuar", 8)) return TOKEN_CONTINUAR;
+            // caso
+            if (is_keyword(lexer, 4, 1, "aso", 3)) {
+                return TOKEN_CASO;
+            }
+
+            // clase
+            if (is_keyword(lexer, 5, 1, "lase", 4)) {
+                return TOKEN_CLASE;
+            }
+
+            // constante
+            if (is_keyword(lexer, 5, 1, "onst", 4)) {
+                return TOKEN_CONST;
+            }
+
+            // continuar
+            if (is_keyword(lexer, 9, 1, "ontinuar", 8)) {
+                return TOKEN_CONTINUAR;
+            }
+
             break;
         case 'f':
-            if (is_keyword(lexer, 3, 1, "un", 2)) return TOKEN_FUN;
-            if (is_keyword(lexer, 5, 1, "also", 4)) return TOKEN_FALSO;
+            // fun
+            if (is_keyword(lexer, 3, 1, "un", 2)) {
+                return TOKEN_FUN;
+            }
+
+            // falso
+            if (is_keyword(lexer, 5, 1, "also", 4)) {
+                return TOKEN_FALSO;
+            }
+
             break;
         case 'm':
-            if (is_keyword(lexer, 8, 1, "ientras", 7)) return TOKEN_MIENTRAS;
+            // mientras
+            if (is_keyword(lexer, 8, 1, "ientras", 7)) {
+                return TOKEN_MIENTRAS;
+            }
+
             break;
         case 'n':
-            if (is_keyword(lexer, 2, 1, "o", 1)) return TOKEN_NO;
-            if (is_keyword(lexer, 4, 1, "ulo", 3)) return TOKEN_NULO;
+            // no
+            if (is_keyword(lexer, 2, 1, "o", 1)) {
+                return TOKEN_NO;
+            }
+
+            // nulo
+            if (is_keyword(lexer, 4, 1, "ulo", 3)) {
+                return TOKEN_NULO;
+            }
+
             break;
         case 'o':
-            if (is_keyword(lexer, 4, 1, "tro", 3)) return TOKEN_OTRO;
-            if (length == 1) return TOKEN_O;
+            // otro
+            if (is_keyword(lexer, 4, 1, "tro", 3)) {
+                return TOKEN_OTRO;
+            }
+
+            // o
+            if (length == 1) {
+                return TOKEN_O;
+            }
+
             break;
         case 'p':
-            if (is_keyword(lexer, 4, 1, "ara", 3)) return TOKEN_PARA;
+            // para
+            if (is_keyword(lexer, 4, 1, "ara", 3)) {
+                return TOKEN_PARA;
+            }
+
             break;
         case 'r':
-            if (is_keyword(lexer, 3, 1, "et", 2)) return TOKEN_RET;
-            if (is_keyword(lexer, 6, 1, "omper", 5)) return TOKEN_ROMPER;
+            // ret
+            if (is_keyword(lexer, 3, 1, "et", 2)) {
+                return TOKEN_RET;
+            }
+
+            // romper
+            if (is_keyword(lexer, 6, 1, "omper", 5)) {
+                return TOKEN_ROMPER;
+            }
+
             break;
         case 's':
-            if (is_keyword(lexer, 2, 1, "i", 1)) return TOKEN_SI;
-            if (is_keyword(lexer, 4, 1, "ino", 3)) return TOKEN_SINO;
-            if (is_keyword(lexer, 5, 1, "egun", 4)) return TOKEN_SEGUN;
+            // si
+            if (is_keyword(lexer, 2, 1, "i", 1)) {
+                return TOKEN_SI;
+            }
+
+            // sino
+            if (is_keyword(lexer, 4, 1, "ino", 3)) {
+                return TOKEN_SINO;
+            }
+            
+            // segun
+            if (is_keyword(lexer, 5, 1, "egun", 4)) {
+                return TOKEN_SEGUN;
+            }
+
             break;
         case 'v':
-            if (is_keyword(lexer, 3, 1, "ar", 2)) return TOKEN_VAR;
-            if (is_keyword(lexer, 9, 1, "erdadero", 8)) return TOKEN_VERDADERO;
+            // var
+            if (is_keyword(lexer, 3, 1, "ar", 2)) {
+                return TOKEN_VAR;
+            }
+
+            // valor
+            if (is_keyword(lexer, 9, 1, "erdadero", 8)) {
+                return TOKEN_VERDADERO;
+            }
+
             break;
         case 'y':
-            if (length == 1) return TOKEN_Y;
+            if (length == 1) {
+                return TOKEN_Y;
+            }
+
             break;
     }
 
@@ -201,8 +277,9 @@ static Token comment(Lexer* lexer) {
 }
 
 static Token identifier(Lexer* lexer) {
-    while (is_alpha(peek(lexer)) || is_digit(peek(lexer)))
+    while (is_alpha(peek(lexer)) || is_digit(peek(lexer))) {
         advance(lexer);
+    }
     
     return make_token(lexer, identifier_type(lexer));
 }
@@ -211,15 +288,17 @@ static Token number(Lexer* lexer) {
     const char* start = lexer->current - 1;
     bool has_decimal = false;
 
-    while (is_digit(peek(lexer)))
+    while (is_digit(peek(lexer))) {
         advance(lexer);
+    }
 
     if (peek(lexer) == '.' && is_digit(peek_next(lexer))) {
         has_decimal = true;
         advance(lexer);
 
-        while (is_digit(peek(lexer)))
+        while (is_digit(peek(lexer))) {
             advance(lexer);
+        }
     }
 
     if (peek(lexer) == '.') {
@@ -244,8 +323,9 @@ static Token string(Lexer* lexer) {
         advance(lexer);
     }
 
-    if (is_at_end(lexer))
+    if (is_at_end(lexer)) {
         return error_token(lexer, "ERROR: Cadena no terminada.");
+    }
 
     advance(lexer);
 
@@ -258,34 +338,71 @@ Token Lexer_next_token(Lexer* lexer) {
     
     char c = advance(lexer);
     
-    if (is_eof(c)) return eof(lexer);
-    if (is_hash(c)) return comment(lexer);
-    if (is_alpha(c)) return identifier(lexer);
-    if (is_digit(c)) return number(lexer);
-    if (is_quote(c)) return string(lexer);
+    // EOF
+    if (is_eof(c)) {
+        return eof(lexer);
+    }
+
+    // Comentario
+    if (is_hash(c)) {
+        return comment(lexer);
+    }
+
+    // Identificador o palabra clave
+    if (is_alpha(c)) {
+        return identifier(lexer);
+    }
+
+    // Numero
+    if (is_digit(c)) {
+        return number(lexer);
+    }
+
+    // Cadena
+    if (is_quote(c)) {
+        return string(lexer);
+    }
 
     switch (c) {
-        // One character tokens
-        case '+': return make_token(lexer, TOKEN_PLUS);
-        case '-': return make_token(lexer, TOKEN_MINUS);
-        case '*': return make_token(lexer, TOKEN_STAR);
-        case '/': return make_token(lexer, TOKEN_SLASH);
-        case '%': return make_token(lexer, TOKEN_PERCENT);
-        case '(': return make_token(lexer, TOKEN_LEFT_PARENTHESIS);
-        case '[': return make_token(lexer, TOKEN_LEFT_BRACKET);
-        case '{': return make_token(lexer, TOKEN_LEFT_BRACE);
-        case ')': return make_token(lexer, TOKEN_RIGHT_PARENTHESIS);
-        case ']': return make_token(lexer, TOKEN_RIGHT_BRACKET);
-        case '}': return make_token(lexer, TOKEN_RIGHT_BRACE);
-        case ',': return make_token(lexer, TOKEN_COMMA);
-        case '.': return make_token(lexer, TOKEN_DOT);
-        case ':': return make_token(lexer, TOKEN_COLON);
+        // Tokens de un caracter
+        case '+': 
+            return make_token(lexer, TOKEN_PLUS);
+        case '-': 
+            return make_token(lexer, TOKEN_MINUS);
+        case '*': 
+            return make_token(lexer, TOKEN_STAR);
+        case '/': 
+            return make_token(lexer, TOKEN_SLASH);
+        case '%': 
+            return make_token(lexer, TOKEN_PERCENT);
+        case '(': 
+            return make_token(lexer, TOKEN_LEFT_PARENTHESIS);
+        case '[': 
+            return make_token(lexer, TOKEN_LEFT_BRACKET);
+        case '{': 
+            return make_token(lexer, TOKEN_LEFT_BRACE);
+        case ')': 
+            return make_token(lexer, TOKEN_RIGHT_PARENTHESIS);
+        case ']': 
+            return make_token(lexer, TOKEN_RIGHT_BRACKET);
+        case '}': 
+            return make_token(lexer, TOKEN_RIGHT_BRACE);
+        case ',': 
+            return make_token(lexer, TOKEN_COMMA);
+        case '.': 
+            return make_token(lexer, TOKEN_DOT);
+        case ':': 
+            return make_token(lexer, TOKEN_COLON);
 
-        // Two character tokens
-        case '=': return make_token(lexer, match(lexer, '=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
-        case '!': return make_token(lexer, match(lexer, '=') ? TOKEN_BANG_EQUAL : TOKEN_ERROR);
-        case '<': return make_token(lexer, match(lexer, '=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
-        case '>': return make_token(lexer, match(lexer, '=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+        // Tokens de dos caracteres
+        case '=': 
+            return make_token(lexer, match(lexer, '=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
+        case '!': 
+            return make_token(lexer, match(lexer, '=') ? TOKEN_BANG_EQUAL : TOKEN_ERROR);
+        case '<': 
+            return make_token(lexer, match(lexer, '=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
+        case '>': 
+            return make_token(lexer, match(lexer, '=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
     }
 
     return make_token(lexer, TOKEN_ERROR);

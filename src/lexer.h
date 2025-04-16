@@ -12,11 +12,6 @@ typedef struct {
     const char* current;
     int line;
     int column;
-
-    int indent_stack[MAXINDENT];
-    int indent_top;
-    bool at_line_start;
-    int pendin;
 } Lexer;
 
 void Lexer_init(Lexer* lexer, const char* source);

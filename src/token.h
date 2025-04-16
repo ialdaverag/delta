@@ -64,11 +64,6 @@ typedef enum {
     // Comentario
     TOKEN_COMMENT, // #.*
 
-    // Indentación
-    TOKEN_INDENT, // Indentación
-    TOKEN_DEDENT, // Desindentación
-    TOKEN_NONE, // Ninguna indentación
-
     // Errores
     TOKEN_ERROR, // Error de análisis
 
