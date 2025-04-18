@@ -114,6 +114,19 @@ static void test_Lexer_position_tracking(void) {
         TEST_ASSERT_EQUAL_STRING("\nx = 10", lexer.current);
         TEST_ASSERT_EQUAL_INT(1, lexer.line);
         TEST_ASSERT_EQUAL_INT(6, lexer.column);
+
+        // \n (primera línea)
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(6, token.column);
+        Token_free(&token);
+
+        TEST_ASSERT_EQUAL_STRING("\nx = 10", lexer.start);
+        TEST_ASSERT_EQUAL_STRING("x = 10", lexer.current);
+        TEST_ASSERT_EQUAL_INT(2, lexer.line);
+        TEST_ASSERT_EQUAL_INT(1, lexer.column);
         
         // x (segunda línea)
         token = Lexer_next_token(&lexer);
@@ -196,9 +209,9 @@ static void test_Lexer_next_token_whitespace(void) {
         Lexer_init(&lexer, "\r");
 
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_EOF, token.type);
-        TEST_ASSERT_EQUAL_STRING("", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(2, token.line);
+        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL_STRING("\r", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
     }
@@ -218,9 +231,9 @@ static void test_Lexer_next_token_whitespace(void) {
         Lexer_init(&lexer, "\n");
 
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_EOF, token.type);
-        TEST_ASSERT_EQUAL_STRING("", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(2, token.line);
+        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
     }
@@ -229,9 +242,34 @@ static void test_Lexer_next_token_whitespace(void) {
         Lexer_init(&lexer, "\r\t\n");
 
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_EOF, token.type);
-        TEST_ASSERT_EQUAL_STRING("", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(3, token.line);
+        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL_STRING("\r", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+}
+
+static void test_Lexer_next_token_newline(void) {
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "\n");
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "\r\n");
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL_STRING("\r\n", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
     }
@@ -829,7 +867,7 @@ static void test_Lexer_next_token_number(void) {
         TEST_ASSERT_EQUAL(TOKEN_ERROR, token.type);
         TEST_ASSERT_EQUAL_STRING("ERROR: Numero mal formado.", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(4, token.column); // Donde detectó el error
+        TEST_ASSERT_EQUAL_INT(1, token.column); // Donde detectó el error
         Token_free(&token);
     }
     {
@@ -840,7 +878,7 @@ static void test_Lexer_next_token_number(void) {
         TEST_ASSERT_EQUAL(TOKEN_ERROR, token.type);
         TEST_ASSERT_EQUAL_STRING("ERROR: Numero mal formado.", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(7, token.column); // Donde detectó el error
+        TEST_ASSERT_EQUAL_INT(1, token.column); // Donde detectó el error
         Token_free(&token);
     }
 }
@@ -995,6 +1033,19 @@ static void test_Lexer_next_token_comment() {
         TEST_ASSERT_EQUAL_STRING("\n#Segundo comentario\n#Tercer comentario", lexer.current);
         TEST_ASSERT_EQUAL_INT(1, lexer.line);
         TEST_ASSERT_EQUAL_INT(19, lexer.column); // 19 caracteres + 1 para el #
+
+        // Nueva línea (primer comentario)
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(19, token.column);
+        Token_free(&token);
+
+        TEST_ASSERT_EQUAL_STRING("\n#Segundo comentario\n#Tercer comentario", lexer.start);
+        TEST_ASSERT_EQUAL_STRING("#Segundo comentario\n#Tercer comentario", lexer.current);
+        TEST_ASSERT_EQUAL_INT(2, lexer.line);
+        TEST_ASSERT_EQUAL_INT(1, lexer.column); // 1 para el #
         
         // Segundo comentario
         token = Lexer_next_token(&lexer);
@@ -1008,6 +1059,19 @@ static void test_Lexer_next_token_comment() {
         TEST_ASSERT_EQUAL_STRING("\n#Tercer comentario", lexer.current);
         TEST_ASSERT_EQUAL_INT(2, lexer.line);
         TEST_ASSERT_EQUAL_INT(20, lexer.column); // 18 caracteres + 1 para el #
+
+        // Nueva línea (segundo comentario)
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(2, token.line);
+        TEST_ASSERT_EQUAL_INT(20, token.column);
+        Token_free(&token);
+
+        TEST_ASSERT_EQUAL_STRING("\n#Tercer comentario", lexer.start);
+        TEST_ASSERT_EQUAL_STRING("#Tercer comentario", lexer.current);
+        TEST_ASSERT_EQUAL_INT(3, lexer.line);
+        TEST_ASSERT_EQUAL_INT(1, lexer.column); // 1 para el #
         
         // Tercer comentario
         token = Lexer_next_token(&lexer);
@@ -1095,6 +1159,7 @@ void test_Lexer_next_token(void) {
     test_Lexer_position_tracking();
     test_Lexer_next_token_EOF();
     test_Lexer_next_token_whitespace();
+    test_Lexer_next_token_newline();
     test_Lexer_next_token_one_char_token();
     test_Lexer_next_token_one_or_two_chars_token();
     test_Lexer_next_token_identifier();

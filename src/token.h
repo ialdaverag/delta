@@ -64,7 +64,10 @@ typedef enum {
     // Comentario
     TOKEN_COMMENT, // #.*
 
-    // Errores
+    // Nueva línea
+    TOKEN_NEWLINE, // \n
+
+    // Error
     TOKEN_ERROR, // Error de análisis
 
     // Fin de archivo
@@ -78,8 +81,8 @@ typedef struct Token {
     int column;
 } Token;
 
-Token Token_init(Token* token, TokenType type, const char* start, const char* current, int line, int column);
+void Token_init(Token* token, TokenType type, const char* start, const char* current, int line, int column);
 void Token_free(Token* token);
-Token Token_print(Token token);
+void Token_print(Token token);
 
 #endif // TOKEN_H

@@ -5,34 +5,13 @@ void Lexer_init(Lexer* lexer, const char* source) {
     lexer->current = source;
     lexer->line = 1;
     lexer->column = 1;
+
+    lexer->token_line = 1;
+    lexer->token_column = 1;
 }
 
 static bool is_at_end(Lexer* lexer) {
     return *lexer->current == '\0';
-}
-
-static char advance(Lexer* lexer) {
-    char c = *lexer->current++;
-
-    if (c == '\r') {
-        if (*lexer->current == '\n') {
-            lexer->current++;
-        }
-
-        lexer->line++;
-        lexer->column = 1;
-
-        return '\n';
-    } else if (c == '\n') {
-        lexer->line++;
-        lexer->column = 1;
-
-        return '\n';
-    } else {
-        lexer->column++;
-
-        return c;
-    }
 }
 
 static char peek(Lexer* lexer) {
@@ -47,17 +26,42 @@ static char peek_next(Lexer* lexer) {
     return lexer->current[1];
 }
 
+static char advance(Lexer* lexer) {
+    char c = *lexer->current++;
+
+    if (c == '\r') {
+        if (*lexer->current == '\n') {
+            lexer->current++;
+        }
+
+        lexer->line++;
+        lexer->column = 1;
+
+        return '\n';
+    }
+
+    if (c == '\n') {
+        lexer->line++;
+        lexer->column = 1;
+
+        return '\n';
+    }
+        
+    lexer->column++;
+
+    return c;
+}
+
 static void skip_whitespace(Lexer* lexer) {
     while (true) {
         char c = peek(lexer);
 
         switch (c) {
             case ' ':
-            case '\r':
-            case '\t':
+            // Si algo falla...
                 advance(lexer);
                 break;
-            case '\n':
+            case '\t':
                 advance(lexer);
                 break;
             default:
@@ -85,10 +89,6 @@ static bool is_hash(char c) {
     return c == '#';
 }
 
-static bool is_eof(char c) {
-    return c == '\0';
-}
-
 static bool is_alpha(char c) {
     return (c >= 'a' && c <= 'z') || 
            (c >= 'A' && c <= 'Z') || 
@@ -103,32 +103,12 @@ static bool is_quote(char c) {
     return c == '\'' || c == '"' ;
 }
 
-static Token make_token(Lexer* lexer, TokenType type) {
-    Token token;
-    Token_init(
-        &token,
-        type,
-        lexer->start,
-        lexer->current,
-        lexer->line,
-        lexer->column - (int)(lexer->current - lexer->start)
-    );
-
-    return token;
+static bool is_eof(char c) {
+    return c == '\0';
 }
 
-static Token error_token(Lexer* lexer, const char* message) {
-    Token token;
-    Token_init(
-        &token, 
-        TOKEN_ERROR, 
-        message, 
-        message + strlen(message), 
-        lexer->line, 
-        lexer->column
-    );
-
-    return token;
+static bool is_newline(char c) {
+    return c == '\n';
 }
 
 static bool is_keyword(Lexer* lexer, int length, int offset, const char* keyword, int keyword_length) {
@@ -264,8 +244,40 @@ static TokenType identifier_type(Lexer* lexer) {
     return TOKEN_IDENTIFIER;
 }
 
+static Token make_token(Lexer* lexer, TokenType type) {
+    Token token;
+    Token_init(
+        &token,
+        type,
+        lexer->start,
+        lexer->current,
+        lexer->token_line,
+        lexer->token_column
+    );
+
+    return token;
+}
+
+static Token error_token(Lexer* lexer, const char* message) {
+    Token token;
+    Token_init(
+        &token, 
+        TOKEN_ERROR, 
+        message, 
+        message + strlen(message), 
+        lexer->token_line,
+        lexer->token_column
+    );
+
+    return token;
+}
+
 static Token eof(Lexer* lexer) {
     return make_token(lexer, TOKEN_EOF);
+}
+
+static Token newline(Lexer* lexer) {
+    return make_token(lexer, TOKEN_NEWLINE);
 }
 
 static Token comment(Lexer* lexer) {
@@ -333,10 +345,21 @@ static Token string(Lexer* lexer) {
 }
 
 Token Lexer_next_token(Lexer* lexer) {
+    // Esquivar espacios en blanco
     skip_whitespace(lexer);
+
+    // Guardar el inicio del token
     lexer->start = lexer->current;
-    
+    lexer->token_line = lexer->line;
+    lexer->token_column = lexer->column;
+
+    // Avanzar al siguiente caracter
     char c = advance(lexer);
+
+    // Nueva línea
+    if (is_newline(c)) {
+        return newline(lexer);
+    }
     
     // EOF
     if (is_eof(c)) {
@@ -363,8 +386,9 @@ Token Lexer_next_token(Lexer* lexer) {
         return string(lexer);
     }
 
+    // Tokens de uno o dos caracteres
     switch (c) {
-        // Tokens de un caracter
+        // Token de un caracter
         case '+': 
             return make_token(lexer, TOKEN_PLUS);
         case '-': 
@@ -394,7 +418,7 @@ Token Lexer_next_token(Lexer* lexer) {
         case ':': 
             return make_token(lexer, TOKEN_COLON);
 
-        // Tokens de dos caracteres
+        // Token de dos caracteres
         case '=': 
             return make_token(lexer, match(lexer, '=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
         case '!': 

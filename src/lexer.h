@@ -12,6 +12,9 @@ typedef struct {
     const char* current;
     int line;
     int column;
+
+    int token_line;
+    int token_column;
 } Lexer;
 
 void Lexer_init(Lexer* lexer, const char* source);
