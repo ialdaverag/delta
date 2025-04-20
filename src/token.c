@@ -111,6 +111,8 @@ static const char* token_type_to_string(TokenType type) {
         // Nueva línea
         case TOKEN_NEWLINE: 
             return "NEWLINE";
+        case TOKEN_NL:
+            return "NL";
 
         // Errores
         case TOKEN_ERROR: 

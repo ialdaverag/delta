@@ -66,6 +66,7 @@ typedef enum {
 
     // Nueva línea
     TOKEN_NEWLINE, // \n
+    TOKEN_NL, // \n
 
     // Error
     TOKEN_ERROR, // Error de análisis

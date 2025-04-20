@@ -209,7 +209,7 @@ static void test_Lexer_next_token_whitespace(void) {
         Lexer_init(&lexer, "\r");
 
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL(TOKEN_NL, token.type);
         TEST_ASSERT_EQUAL_STRING("\r", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
@@ -231,7 +231,7 @@ static void test_Lexer_next_token_whitespace(void) {
         Lexer_init(&lexer, "\n");
 
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL(TOKEN_NL, token.type);
         TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
@@ -242,7 +242,7 @@ static void test_Lexer_next_token_whitespace(void) {
         Lexer_init(&lexer, "\r\t\n");
 
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL(TOKEN_NL, token.type);
         TEST_ASSERT_EQUAL_STRING("\r", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
@@ -256,7 +256,7 @@ static void test_Lexer_next_token_newline(void) {
         Lexer_init(&lexer, "\n");
 
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL(TOKEN_NL, token.type);
         TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
@@ -267,7 +267,7 @@ static void test_Lexer_next_token_newline(void) {
         Lexer_init(&lexer, "\r\n");
 
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL(TOKEN_NL, token.type);
         TEST_ASSERT_EQUAL_STRING("\r\n", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
@@ -1036,7 +1036,7 @@ static void test_Lexer_next_token_comment() {
 
         // Nueva línea (primer comentario)
         token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL(TOKEN_NL, token.type);
         TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(19, token.column);
@@ -1062,7 +1062,7 @@ static void test_Lexer_next_token_comment() {
 
         // Nueva línea (segundo comentario)
         token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL(TOKEN_NL, token.type);
         TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
         TEST_ASSERT_EQUAL_INT(2, token.line);
         TEST_ASSERT_EQUAL_INT(20, token.column);

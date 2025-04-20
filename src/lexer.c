@@ -8,6 +8,9 @@ void Lexer_init(Lexer* lexer, const char* source) {
 
     lexer->token_line = 1;
     lexer->token_column = 1;
+
+    lexer->parent_level = 0;
+    lexer->saw_token = false;
 }
 
 static bool is_at_end(Lexer* lexer) {
@@ -58,7 +61,6 @@ static void skip_whitespace(Lexer* lexer) {
 
         switch (c) {
             case ' ':
-            // Si algo falla...
                 advance(lexer);
                 break;
             case '\t':
@@ -108,7 +110,7 @@ static bool is_eof(char c) {
 }
 
 static bool is_newline(char c) {
-    return c == '\n';
+    return c == '\n' || c == '\r';  // Considera ambos como newline
 }
 
 static bool is_keyword(Lexer* lexer, int length, int offset, const char* keyword, int keyword_length) {
@@ -245,6 +247,15 @@ static TokenType identifier_type(Lexer* lexer) {
 }
 
 static Token make_token(Lexer* lexer, TokenType type) {
+    // Marcar token como significativo
+    if (type != TOKEN_COMMENT && 
+        type != TOKEN_NEWLINE && 
+        type != TOKEN_NL && 
+        type != TOKEN_EOF && 
+        type != TOKEN_ERROR) {
+        lexer->saw_token = true;
+    }
+
     Token token;
     Token_init(
         &token,
@@ -276,12 +287,9 @@ static Token eof(Lexer* lexer) {
     return make_token(lexer, TOKEN_EOF);
 }
 
-static Token newline(Lexer* lexer) {
-    return make_token(lexer, TOKEN_NEWLINE);
-}
-
 static Token comment(Lexer* lexer) {
-    while (peek(lexer) != '\n' && !is_at_end(lexer)) {
+    // 1. Consumir todo el comentario (excepto el \n)
+    while (!is_at_end(lexer) && !is_newline(peek(lexer))) {
         advance(lexer);
     }
 
@@ -358,7 +366,17 @@ Token Lexer_next_token(Lexer* lexer) {
 
     // Nueva línea
     if (is_newline(c)) {
-        return newline(lexer);
+        Token token;
+    
+        if (lexer->parent_level > 0 || !lexer->saw_token) {
+            token = make_token(lexer, TOKEN_NL);
+        } else {
+            token = make_token(lexer, TOKEN_NEWLINE);
+        }
+    
+        lexer->saw_token = false;
+        
+        return token;
     }
     
     // EOF
@@ -400,16 +418,22 @@ Token Lexer_next_token(Lexer* lexer) {
         case '%': 
             return make_token(lexer, TOKEN_PERCENT);
         case '(': 
+            lexer->parent_level++;
             return make_token(lexer, TOKEN_LEFT_PARENTHESIS);
         case '[': 
+            lexer->parent_level++;
             return make_token(lexer, TOKEN_LEFT_BRACKET);
         case '{': 
+            lexer->parent_level++;
             return make_token(lexer, TOKEN_LEFT_BRACE);
         case ')': 
+            lexer->parent_level--;
             return make_token(lexer, TOKEN_RIGHT_PARENTHESIS);
         case ']': 
+            lexer->parent_level--;
             return make_token(lexer, TOKEN_RIGHT_BRACKET);
         case '}': 
+            lexer->parent_level--;
             return make_token(lexer, TOKEN_RIGHT_BRACE);
         case ',': 
             return make_token(lexer, TOKEN_COMMA);

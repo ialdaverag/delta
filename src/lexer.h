@@ -15,6 +15,9 @@ typedef struct {
 
     int token_line;
     int token_column;
+
+    int parent_level;
+    bool saw_token;
 } Lexer;
 
 void Lexer_init(Lexer* lexer, const char* source);
