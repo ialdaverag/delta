@@ -3,9 +3,10 @@
 
 #include <stdbool.h>
 #include <string.h> 
+#include <stdlib.h>
 #include "token.h" 
 
-#define MAXINDENT 100
+#define MAX_PARENT_STACK 100
 
 typedef struct {
     const char* start;
@@ -16,8 +17,12 @@ typedef struct {
     int token_line;
     int token_column;
 
-    int parent_level;
     bool saw_token;
+
+    int parent_level;
+    int parent_stack[MAX_PARENT_STACK];
+    int parent_line_stack[MAX_PARENT_STACK];
+    int parent_column_stack[MAX_PARENT_STACK];
 } Lexer;
 
 void Lexer_init(Lexer* lexer, const char* source);

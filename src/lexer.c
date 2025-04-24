@@ -118,6 +118,38 @@ static bool is_keyword(Lexer* lexer, int length, int offset, const char* keyword
            (memcmp(lexer->start + offset, keyword, keyword_length) == 0);
 }
 
+static void push_parent(Lexer* lexer, char c) {
+    if (lexer->parent_level >= MAX_PARENT_STACK) {
+        fprintf(stderr, "ERROR: Demasiada profundidad de paréntesis.\n");
+        exit(1);
+    }
+
+    lexer->parent_stack[lexer->parent_level] = c;
+    lexer->parent_line_stack[lexer->parent_level] = lexer->line;
+    lexer->parent_column_stack[lexer->parent_level] = lexer->column;
+    lexer->parent_level++;
+}
+
+static bool pop_paren(Lexer* lexer, char closing) {
+    if (lexer->parent_level == 0) {
+        return false;
+    }
+
+    char opening = lexer->parent_stack[lexer->parent_level - 1];
+
+    bool matches = (opening == '(' && closing == ')') ||
+                   (opening == '[' && closing == ']') ||
+                   (opening == '{' && closing == '}');
+
+    if (matches) {
+        lexer->parent_level--;
+
+        return true;
+    }
+
+    return false;
+}
+
 static TokenType identifier_type(Lexer* lexer) {
     int length = lexer->current - lexer->start;
 
@@ -381,9 +413,13 @@ Token Lexer_next_token(Lexer* lexer) {
     
     // EOF
     if (is_eof(c)) {
+        if (lexer->parent_level > 0) {
+            return error_token(lexer, "ERROR: Parentesis no cerrado al final del archivo.");
+        }
+
         return eof(lexer);
     }
-
+    
     // Comentario
     if (is_hash(c)) {
         return comment(lexer);
@@ -417,24 +453,31 @@ Token Lexer_next_token(Lexer* lexer) {
             return make_token(lexer, TOKEN_SLASH);
         case '%': 
             return make_token(lexer, TOKEN_PERCENT);
-        case '(': 
-            lexer->parent_level++;
-            return make_token(lexer, TOKEN_LEFT_PARENTHESIS);
-        case '[': 
-            lexer->parent_level++;
-            return make_token(lexer, TOKEN_LEFT_BRACKET);
-        case '{': 
-            lexer->parent_level++;
-            return make_token(lexer, TOKEN_LEFT_BRACE);
-        case ')': 
-            lexer->parent_level--;
-            return make_token(lexer, TOKEN_RIGHT_PARENTHESIS);
-        case ']': 
-            lexer->parent_level--;
-            return make_token(lexer, TOKEN_RIGHT_BRACKET);
-        case '}': 
-            lexer->parent_level--;
-            return make_token(lexer, TOKEN_RIGHT_BRACE);
+
+        // Delimitadores de apertura
+        case '(':
+        case '[':
+        case '{':
+            push_parent(lexer, c);
+
+            return make_token(lexer,
+                c == '(' ? TOKEN_LEFT_PARENTHESIS :
+                c == '[' ? TOKEN_LEFT_BRACKET :
+                            TOKEN_LEFT_BRACE);
+        
+        // Delimitadores de cierre
+        case ')':
+        case ']':
+        case '}':
+            if (!pop_paren(lexer, c)) {
+                return error_token(lexer, "ERROR: Parentesis de cierre inesperado o no coincide.");
+            }
+
+            return make_token(lexer,
+                c == ')' ? TOKEN_RIGHT_PARENTHESIS :
+                c == ']' ? TOKEN_RIGHT_BRACKET :
+                            TOKEN_RIGHT_BRACE);
+        
         case ',': 
             return make_token(lexer, TOKEN_COMMA);
         case '.': 
