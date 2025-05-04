@@ -114,6 +114,12 @@ static const char* token_type_to_string(TokenType type) {
         case TOKEN_NL:
             return "NL";
 
+        // Identación
+        case TOKEN_INDENT: 
+            return "INDENT";
+        case TOKEN_DEDENT:
+            return "DEDENT";
+
         // Errores
         case TOKEN_ERROR: 
             return "ERROR";

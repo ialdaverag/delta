@@ -7,6 +7,8 @@
 #include "token.h" 
 
 #define MAX_PARENT_STACK 100
+#define MAXINDENT 100
+#define TABSIZE 4
 
 typedef struct {
     const char* start;
@@ -18,6 +20,11 @@ typedef struct {
     int token_column;
 
     bool saw_token;
+
+    int indent;
+    int indstack[MAXINDENT];
+    int pending;
+    bool atbol;
 
     int parent_level;
     int parent_stack[MAX_PARENT_STACK];

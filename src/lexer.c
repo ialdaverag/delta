@@ -9,6 +9,11 @@ void Lexer_init(Lexer* lexer, const char* source) {
     lexer->token_line = 1;
     lexer->token_column = 1;
 
+    lexer->indstack[0] = 0;
+    lexer->indent = 0;
+    lexer->pending = 0;
+    lexer->atbol = true;
+
     lexer->parent_level = 0;
     lexer->saw_token = false;
 }
@@ -55,21 +60,42 @@ static char advance(Lexer* lexer) {
     return c;
 }
 
-static void skip_whitespace(Lexer* lexer) {
-    while (true) {
-        char c = peek(lexer);
-
-        switch (c) {
-            case ' ':
-                advance(lexer);
-                break;
-            case '\t':
-                advance(lexer);
-                break;
-            default:
-                return;
-        }
+static void push_parent(Lexer* lexer, char c) {
+    if (lexer->parent_level >= MAX_PARENT_STACK) {
+        fprintf(stderr, "ERROR: Demasiada profundidad de paréntesis.\n");
+        exit(1);
     }
+
+    lexer->parent_stack[lexer->parent_level] = c;
+    lexer->parent_line_stack[lexer->parent_level] = lexer->line;
+    lexer->parent_column_stack[lexer->parent_level] = lexer->column;
+    lexer->parent_level++;
+}
+
+static void skip_whitespace(Lexer* lexer) {
+    while (peek(lexer) == ' ' || peek(lexer) == '\t') {
+        advance(lexer);
+    }
+}
+
+static bool pop_paren(Lexer* lexer, char closing) {
+    if (lexer->parent_level == 0) {
+        return false;
+    }
+
+    char opening = lexer->parent_stack[lexer->parent_level - 1];
+
+    bool matches = (opening == '(' && closing == ')') ||
+                   (opening == '[' && closing == ']') ||
+                   (opening == '{' && closing == '}');
+
+    if (matches) {
+        lexer->parent_level--;
+
+        return true;
+    }
+
+    return false;
 }
 
 static bool match(Lexer* lexer, char expected) {
@@ -116,38 +142,6 @@ static bool is_newline(char c) {
 static bool is_keyword(Lexer* lexer, int length, int offset, const char* keyword, int keyword_length) {
     return (lexer->current - lexer->start == length) && 
            (memcmp(lexer->start + offset, keyword, keyword_length) == 0);
-}
-
-static void push_parent(Lexer* lexer, char c) {
-    if (lexer->parent_level >= MAX_PARENT_STACK) {
-        fprintf(stderr, "ERROR: Demasiada profundidad de paréntesis.\n");
-        exit(1);
-    }
-
-    lexer->parent_stack[lexer->parent_level] = c;
-    lexer->parent_line_stack[lexer->parent_level] = lexer->line;
-    lexer->parent_column_stack[lexer->parent_level] = lexer->column;
-    lexer->parent_level++;
-}
-
-static bool pop_paren(Lexer* lexer, char closing) {
-    if (lexer->parent_level == 0) {
-        return false;
-    }
-
-    char opening = lexer->parent_stack[lexer->parent_level - 1];
-
-    bool matches = (opening == '(' && closing == ')') ||
-                   (opening == '[' && closing == ']') ||
-                   (opening == '{' && closing == '}');
-
-    if (matches) {
-        lexer->parent_level--;
-
-        return true;
-    }
-
-    return false;
 }
 
 static TokenType identifier_type(Lexer* lexer) {
@@ -283,7 +277,8 @@ static Token make_token(Lexer* lexer, TokenType type) {
     if (type != TOKEN_COMMENT && 
         type != TOKEN_NEWLINE && 
         type != TOKEN_NL && 
-        type != TOKEN_EOF && 
+        type != TOKEN_EOF &&
+        type != TOKEN_NULL && 
         type != TOKEN_ERROR) {
         lexer->saw_token = true;
     }
@@ -320,7 +315,6 @@ static Token eof(Lexer* lexer) {
 }
 
 static Token comment(Lexer* lexer) {
-    // 1. Consumir todo el comentario (excepto el \n)
     while (!is_at_end(lexer) && !is_newline(peek(lexer))) {
         advance(lexer);
     }
@@ -384,8 +378,97 @@ static Token string(Lexer* lexer) {
     return make_token(lexer, TOKEN_STRING);
 }
 
+static Token get_pending_indentation_token(Lexer* lexer) {
+    if (lexer->pending > 0) {
+        lexer->pending--;
+        return make_token(lexer, TOKEN_INDENT);
+    } else {
+        lexer->pending++;
+        return make_token(lexer, TOKEN_DEDENT);
+    }
+}
+
+static Token handle_line_indent(Lexer* lexer) {
+    if (lexer->atbol) {
+        lexer->start = lexer->current;
+        lexer->token_line = lexer->line;
+        lexer->token_column = lexer->column;
+        
+        int col = 0;
+        bool has_tabs = false;
+        bool has_spaces = false;
+        
+        while (peek(lexer) == ' ' || peek(lexer) == '\t') {
+            if (peek(lexer) == ' ') {
+                col++;
+                has_spaces = true;
+            } else {
+                col += TABSIZE;
+                has_tabs = true;
+            }
+
+            if (has_tabs && has_spaces) {
+                lexer->current = lexer->start;
+                printf("ERROR: Mezcla de espacios y tabulaciones en la indentación.\n");
+                return error_token(lexer, "ERROR: Mezcla de espacios y tabulaciones en la indentación.");
+            }
+
+            advance(lexer);
+        }
+        
+        lexer->atbol = false;
+        
+        if (peek(lexer) == '\n' || peek(lexer) == '\r' || peek(lexer) == '#' || peek(lexer) == '\0') {
+            return make_token(lexer, TOKEN_NULL);
+        } 
+
+        if (col > lexer->indstack[lexer->indent]) {
+            if (lexer->indent + 1 >= MAXINDENT) {
+                lexer->current = lexer->start;
+                printf("ERROR: Excedido el nivel máximo de indentación.\n");
+                return error_token(lexer, "ERROR: Excedido el nivel máximo de indentación.");
+            }
+
+            lexer->indstack[++lexer->indent] = col;
+            lexer->pending = 1;
+        } else if (col < lexer->indstack[lexer->indent]) {
+            while (lexer->indent > 0 && col < lexer->indstack[lexer->indent]) {
+                lexer->indent--;
+                lexer->pending--;
+            }
+            
+            if (col != lexer->indstack[lexer->indent]) {
+                lexer->pending = 0;
+                lexer->current = lexer->start;
+                printf("ERROR: Indentación no válida.\n");
+                return error_token(lexer, "ERROR: Indentación no válida.");
+            }
+        }
+    }
+    
+    return make_token(lexer, TOKEN_NULL);
+}
+
 Token Lexer_next_token(Lexer* lexer) {
-    // Esquivar espacios en blanco
+    // Manejar indentación y tokens pendientes
+    Token indent_token = handle_line_indent(lexer);
+    if (indent_token.type != TOKEN_NULL) {
+        return indent_token;
+    }
+    
+    // Verificar si hay tokens pendientes de indentación
+    if (lexer->pending != 0) {
+        return get_pending_indentation_token(lexer);
+    }
+
+    // Si estamos al final del archivo y aún hay indentación pendiente
+    if (is_at_end(lexer) && lexer->indent > 0) {
+        lexer->indent--;
+        lexer->pending = -1;
+        return get_pending_indentation_token(lexer);
+    }
+
+    // Esquivar espacios en blanco (sin procesar indentación)
     skip_whitespace(lexer);
 
     // Guardar el inicio del token
@@ -393,9 +476,9 @@ Token Lexer_next_token(Lexer* lexer) {
     lexer->token_line = lexer->line;
     lexer->token_column = lexer->column;
 
-    // Avanzar al siguiente caracter
+    // El resto del código original...
     char c = advance(lexer);
-
+    
     // Nueva línea
     if (is_newline(c)) {
         Token token;
@@ -407,6 +490,7 @@ Token Lexer_next_token(Lexer* lexer) {
         }
     
         lexer->saw_token = false;
+        lexer->atbol = true;
         
         return token;
     }

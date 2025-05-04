@@ -68,6 +68,11 @@ typedef enum {
     TOKEN_NEWLINE, // \n
     TOKEN_NL, // \n
 
+    // Identación
+    TOKEN_INDENT,
+    TOKEN_DEDENT,
+    TOKEN_NULL,
+
     // Error
     TOKEN_ERROR, // Error de análisis
 
