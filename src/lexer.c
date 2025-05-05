@@ -9,13 +9,14 @@ void Lexer_init(Lexer* lexer, const char* source) {
     lexer->token_line = 1;
     lexer->token_column = 1;
 
-    lexer->indstack[0] = 0;
-    lexer->indent = 0;
+    lexer->saw_token = false;
+
+    lexer->indent_stack[0] = 0;
+    lexer->indent_top = 0;
     lexer->pending = 0;
     lexer->atbol = true;
 
-    lexer->parent_level = 0;
-    lexer->saw_token = false;
+    lexer->parent_top = 0;
 }
 
 static bool is_at_end(Lexer* lexer) {
@@ -61,15 +62,15 @@ static char advance(Lexer* lexer) {
 }
 
 static void push_parent(Lexer* lexer, char c) {
-    if (lexer->parent_level >= MAX_PARENT_STACK) {
+    if (lexer->parent_top >= MAX_PARENT_STACK) {
         fprintf(stderr, "ERROR: Demasiada profundidad de paréntesis.\n");
         exit(1);
     }
 
-    lexer->parent_stack[lexer->parent_level] = c;
-    lexer->parent_line_stack[lexer->parent_level] = lexer->line;
-    lexer->parent_column_stack[lexer->parent_level] = lexer->column;
-    lexer->parent_level++;
+    lexer->parent_stack[lexer->parent_top] = c;
+    lexer->parent_line_stack[lexer->parent_top] = lexer->line;
+    lexer->parent_column_stack[lexer->parent_top] = lexer->column;
+    lexer->parent_top++;
 }
 
 static void skip_whitespace(Lexer* lexer) {
@@ -78,19 +79,19 @@ static void skip_whitespace(Lexer* lexer) {
     }
 }
 
-static bool pop_paren(Lexer* lexer, char closing) {
-    if (lexer->parent_level == 0) {
+static bool pop_parent(Lexer* lexer, char closing) {
+    if (lexer->parent_top == 0) {
         return false;
     }
 
-    char opening = lexer->parent_stack[lexer->parent_level - 1];
+    char opening = lexer->parent_stack[lexer->parent_top - 1];
 
     bool matches = (opening == '(' && closing == ')') ||
                    (opening == '[' && closing == ']') ||
                    (opening == '{' && closing == '}');
 
     if (matches) {
-        lexer->parent_level--;
+        lexer->parent_top--;
 
         return true;
     }
@@ -113,6 +114,14 @@ static bool match(Lexer* lexer, char expected) {
     return true;
 }
 
+static bool is_eof(char c) {
+    return c == '\0';
+}
+
+static bool is_newline(char c) {
+    return c == '\n' || c == '\r';  // Considera ambos como newline
+}
+
 static bool is_hash(char c) {
     return c == '#';
 }
@@ -131,145 +140,15 @@ static bool is_quote(char c) {
     return c == '\'' || c == '"' ;
 }
 
-static bool is_eof(char c) {
-    return c == '\0';
-}
-
-static bool is_newline(char c) {
-    return c == '\n' || c == '\r';  // Considera ambos como newline
+static bool is_delimiter(char c) {
+    return c == '(' || c == ')' || 
+           c == '[' || c == ']' || 
+           c == '{' || c == '}';
 }
 
 static bool is_keyword(Lexer* lexer, int length, int offset, const char* keyword, int keyword_length) {
     return (lexer->current - lexer->start == length) && 
            (memcmp(lexer->start + offset, keyword, keyword_length) == 0);
-}
-
-static TokenType identifier_type(Lexer* lexer) {
-    int length = lexer->current - lexer->start;
-
-    switch (lexer->start[0]) {
-        case 'c':
-            // caso
-            if (is_keyword(lexer, 4, 1, "aso", 3)) {
-                return TOKEN_CASO;
-            }
-
-            // clase
-            if (is_keyword(lexer, 5, 1, "lase", 4)) {
-                return TOKEN_CLASE;
-            }
-
-            // constante
-            if (is_keyword(lexer, 5, 1, "onst", 4)) {
-                return TOKEN_CONST;
-            }
-
-            // continuar
-            if (is_keyword(lexer, 9, 1, "ontinuar", 8)) {
-                return TOKEN_CONTINUAR;
-            }
-
-            break;
-        case 'f':
-            // fun
-            if (is_keyword(lexer, 3, 1, "un", 2)) {
-                return TOKEN_FUN;
-            }
-
-            // falso
-            if (is_keyword(lexer, 5, 1, "also", 4)) {
-                return TOKEN_FALSO;
-            }
-
-            break;
-        case 'm':
-            // mientras
-            if (is_keyword(lexer, 8, 1, "ientras", 7)) {
-                return TOKEN_MIENTRAS;
-            }
-
-            break;
-        case 'n':
-            // no
-            if (is_keyword(lexer, 2, 1, "o", 1)) {
-                return TOKEN_NO;
-            }
-
-            // nulo
-            if (is_keyword(lexer, 4, 1, "ulo", 3)) {
-                return TOKEN_NULO;
-            }
-
-            break;
-        case 'o':
-            // otro
-            if (is_keyword(lexer, 4, 1, "tro", 3)) {
-                return TOKEN_OTRO;
-            }
-
-            // o
-            if (length == 1) {
-                return TOKEN_O;
-            }
-
-            break;
-        case 'p':
-            // para
-            if (is_keyword(lexer, 4, 1, "ara", 3)) {
-                return TOKEN_PARA;
-            }
-
-            break;
-        case 'r':
-            // ret
-            if (is_keyword(lexer, 3, 1, "et", 2)) {
-                return TOKEN_RET;
-            }
-
-            // romper
-            if (is_keyword(lexer, 6, 1, "omper", 5)) {
-                return TOKEN_ROMPER;
-            }
-
-            break;
-        case 's':
-            // si
-            if (is_keyword(lexer, 2, 1, "i", 1)) {
-                return TOKEN_SI;
-            }
-
-            // sino
-            if (is_keyword(lexer, 4, 1, "ino", 3)) {
-                return TOKEN_SINO;
-            }
-            
-            // segun
-            if (is_keyword(lexer, 5, 1, "egun", 4)) {
-                return TOKEN_SEGUN;
-            }
-
-            break;
-        case 'v':
-            // var
-            if (is_keyword(lexer, 3, 1, "ar", 2)) {
-                return TOKEN_VAR;
-            }
-
-            // valor
-            if (is_keyword(lexer, 9, 1, "erdadero", 8)) {
-                return TOKEN_VERDADERO;
-            }
-
-            break;
-        case 'y':
-            if (length == 1) {
-                return TOKEN_Y;
-            }
-
-            break;
-    }
-
-    return TOKEN_IDENTIFIER;
 }
 
 static Token make_token(Lexer* lexer, TokenType type) {
@@ -310,8 +189,102 @@ static Token error_token(Lexer* lexer, const char* message) {
     return token;
 }
 
+static Token get_pending_indentation_token(Lexer* lexer) {
+    // lexer->start = lexer->current;
+    // lexer->token_line = lexer->line;
+    // lexer->token_column = lexer->column;
+
+    if (lexer->pending > 0) {
+        lexer->pending--;
+        return make_token(lexer, TOKEN_INDENT);
+    } else {
+        lexer->pending++;
+        return make_token(lexer, TOKEN_DEDENT);
+    }
+}
+
+static Token handle_line_indent(Lexer* lexer) {
+    if (lexer->atbol && lexer->parent_top == 0) {
+        lexer->start = lexer->current;
+        lexer->token_line = lexer->line;
+        lexer->token_column = lexer->column;
+        
+        int col = 0;
+        bool has_tabs = false;
+        bool has_spaces = false;
+        
+        while (peek(lexer) == ' ' || peek(lexer) == '\t') {
+            if (peek(lexer) == ' ') {
+                col++;
+                has_spaces = true;
+            } else {
+                col += TAB_SIZE;
+                has_tabs = true;
+            }
+
+            if (has_tabs && has_spaces) {
+                lexer->current = lexer->start;
+
+                return error_token(lexer, "ERROR: Mezcla de espacios y tabulaciones en la indentación.");
+            }
+
+            advance(lexer);
+        }
+        
+        lexer->atbol = false;
+        
+        if (peek(lexer) == '\n' || peek(lexer) == '\r' || peek(lexer) == '#' || peek(lexer) == '\0') {
+            return make_token(lexer, TOKEN_NULL);
+        } 
+
+        if (col > lexer->indent_stack[lexer->indent_top]) {
+            if (lexer->indent_top + 1 >= MAX_INDENT_STACK) {
+                lexer->current = lexer->start;
+
+                return error_token(lexer, "ERROR: Excedido el nivel máximo de indentación.");
+            }
+
+            lexer->indent_stack[++lexer->indent_top] = col;
+            lexer->pending = 1;
+        } else if (col < lexer->indent_stack[lexer->indent_top]) {
+            while (lexer->indent_top > 0 && col < lexer->indent_stack[lexer->indent_top]) {
+                lexer->indent_top--;
+                lexer->pending--;
+            }
+            
+            if (col != lexer->indent_stack[lexer->indent_top]) {
+                lexer->pending = 0;
+                lexer->current = lexer->start;
+
+                return error_token(lexer, "ERROR: Indentación no válida.");
+            }
+        }
+    }
+
+    return make_token(lexer, TOKEN_NULL);
+}
+
 static Token eof(Lexer* lexer) {
+    if (lexer->parent_top > 0) {
+        return error_token(lexer, "ERROR: Parentesis no cerrado al final del archivo.");
+    }
+
     return make_token(lexer, TOKEN_EOF);
+}
+
+static Token newline(Lexer* lexer) {
+    Token token;
+    
+    if (lexer->parent_top > 0 || !lexer->saw_token) {
+        token = make_token(lexer, TOKEN_NL);
+    } else {
+        token = make_token(lexer, TOKEN_NEWLINE);
+    }
+
+    lexer->saw_token = false;
+    lexer->atbol = true;
+    
+    return token;
 }
 
 static Token comment(Lexer* lexer) {
@@ -322,12 +295,120 @@ static Token comment(Lexer* lexer) {
     return make_token(lexer, TOKEN_COMMENT);
 }
 
-static Token identifier(Lexer* lexer) {
+static Token identifier_or_keyword(Lexer* lexer) {
+    // Avanzar sobre caracteres alfabéticos y numéricos
     while (is_alpha(peek(lexer)) || is_digit(peek(lexer))) {
         advance(lexer);
     }
-    
-    return make_token(lexer, identifier_type(lexer));
+
+    // Determinar el tipo de identificador o palabra clave
+    int length = lexer->current - lexer->start;
+
+    switch (lexer->start[0]) {
+        case 'c':
+            if (is_keyword(lexer, 4, 1, "aso", 3)) {
+                return make_token(lexer, TOKEN_CASO);
+            }
+
+            if (is_keyword(lexer, 5, 1, "lase", 4)) {
+                return make_token(lexer, TOKEN_CLASE);
+            }
+
+            if (is_keyword(lexer, 5, 1, "onst", 4)) {
+                return make_token(lexer, TOKEN_CONST);
+            }
+
+            if (is_keyword(lexer, 9, 1, "ontinuar", 8)) {
+                return make_token(lexer, TOKEN_CONTINUAR);
+            }
+
+            break;
+        case 'f':
+            if (is_keyword(lexer, 3, 1, "un", 2)) {
+                return make_token(lexer, TOKEN_FUN);
+            }
+
+            if (is_keyword(lexer, 5, 1, "also", 4)) {
+                return make_token(lexer, TOKEN_FALSO);
+            }
+
+            break;
+        case 'm':
+            if (is_keyword(lexer, 8, 1, "ientras", 7)) {
+                return make_token(lexer, TOKEN_MIENTRAS);
+            }
+
+            break;
+        case 'n':
+            if (is_keyword(lexer, 2, 1, "o", 1)) {
+                return make_token(lexer, TOKEN_NO);
+            }
+
+            if (is_keyword(lexer, 4, 1, "ulo", 3)) {
+                return make_token(lexer, TOKEN_NULO);
+            }
+
+            break;
+        case 'o':
+            if (is_keyword(lexer, 4, 1, "tro", 3)) {
+                return make_token(lexer, TOKEN_OTRO);
+            }
+
+            if (length == 1) {
+                return make_token(lexer, TOKEN_O);
+            }
+
+            break;
+        case 'p':
+            if (is_keyword(lexer, 4, 1, "ara", 3)) {
+                return make_token(lexer, TOKEN_PARA);
+            }
+
+            break;
+        case 'r':
+            if (is_keyword(lexer, 3, 1, "et", 2)) {
+                return make_token(lexer, TOKEN_RET);
+            }
+
+            if (is_keyword(lexer, 6, 1, "omper", 5)) {
+                return make_token(lexer, TOKEN_ROMPER);
+            }
+
+            break;
+        case 's':
+            if (is_keyword(lexer, 2, 1, "i", 1)) {
+                return make_token(lexer, TOKEN_SI);
+            }
+
+            if (is_keyword(lexer, 4, 1, "ino", 3)) {
+                return make_token(lexer, TOKEN_SINO);
+            }
+
+            if (is_keyword(lexer, 5, 1, "egun", 4)) {
+                return make_token(lexer, TOKEN_SEGUN);
+            }
+
+            break;
+        case 'v':
+            if (is_keyword(lexer, 3, 1, "ar", 2)) {
+                return make_token(lexer, TOKEN_VAR);
+            }
+
+            if (is_keyword(lexer, 9, 1, "erdadero", 8)) {
+                return make_token(lexer, TOKEN_VERDADERO);
+            }
+
+            break;
+        case 'y':
+            if (length == 1) {
+                return make_token(lexer, TOKEN_Y);
+            }
+
+            break;
+    }
+
+    // Si no es una palabra clave, es un identificador genérico
+    return make_token(lexer, TOKEN_IDENTIFIER);
 }
 
 static Token number(Lexer* lexer) {
@@ -378,75 +459,26 @@ static Token string(Lexer* lexer) {
     return make_token(lexer, TOKEN_STRING);
 }
 
-static Token get_pending_indentation_token(Lexer* lexer) {
-    if (lexer->pending > 0) {
-        lexer->pending--;
-        return make_token(lexer, TOKEN_INDENT);
-    } else {
-        lexer->pending++;
-        return make_token(lexer, TOKEN_DEDENT);
-    }
-}
+static Token delimiter(Lexer* lexer, char c) {
+    if (c == '(' || c == '[' || c == '{') {
+        push_parent(lexer, c);
 
-static Token handle_line_indent(Lexer* lexer) {
-    if (lexer->atbol) {
-        lexer->start = lexer->current;
-        lexer->token_line = lexer->line;
-        lexer->token_column = lexer->column;
-        
-        int col = 0;
-        bool has_tabs = false;
-        bool has_spaces = false;
-        
-        while (peek(lexer) == ' ' || peek(lexer) == '\t') {
-            if (peek(lexer) == ' ') {
-                col++;
-                has_spaces = true;
-            } else {
-                col += TABSIZE;
-                has_tabs = true;
-            }
-
-            if (has_tabs && has_spaces) {
-                lexer->current = lexer->start;
-                printf("ERROR: Mezcla de espacios y tabulaciones en la indentación.\n");
-                return error_token(lexer, "ERROR: Mezcla de espacios y tabulaciones en la indentación.");
-            }
-
-            advance(lexer);
+        return make_token(lexer,
+            c == '(' ? TOKEN_LEFT_PARENTHESIS :
+            c == '[' ? TOKEN_LEFT_BRACKET :
+                        TOKEN_LEFT_BRACE);
+    } else if (c == ')' || c == ']' || c == '}') {
+        if (!pop_parent(lexer, c)) {
+            return error_token(lexer, "ERROR: Parentesis de cierre inesperado o no coincide.");
         }
-        
-        lexer->atbol = false;
-        
-        if (peek(lexer) == '\n' || peek(lexer) == '\r' || peek(lexer) == '#' || peek(lexer) == '\0') {
-            return make_token(lexer, TOKEN_NULL);
-        } 
 
-        if (col > lexer->indstack[lexer->indent]) {
-            if (lexer->indent + 1 >= MAXINDENT) {
-                lexer->current = lexer->start;
-                printf("ERROR: Excedido el nivel máximo de indentación.\n");
-                return error_token(lexer, "ERROR: Excedido el nivel máximo de indentación.");
-            }
-
-            lexer->indstack[++lexer->indent] = col;
-            lexer->pending = 1;
-        } else if (col < lexer->indstack[lexer->indent]) {
-            while (lexer->indent > 0 && col < lexer->indstack[lexer->indent]) {
-                lexer->indent--;
-                lexer->pending--;
-            }
-            
-            if (col != lexer->indstack[lexer->indent]) {
-                lexer->pending = 0;
-                lexer->current = lexer->start;
-                printf("ERROR: Indentación no válida.\n");
-                return error_token(lexer, "ERROR: Indentación no válida.");
-            }
-        }
+        return make_token(lexer,
+            c == ')' ? TOKEN_RIGHT_PARENTHESIS :
+            c == ']' ? TOKEN_RIGHT_BRACKET :
+                        TOKEN_RIGHT_BRACE);
     }
-    
-    return make_token(lexer, TOKEN_NULL);
+
+    return make_token(lexer, TOKEN_ERROR); // En caso de un carácter inesperado
 }
 
 Token Lexer_next_token(Lexer* lexer) {
@@ -455,16 +487,17 @@ Token Lexer_next_token(Lexer* lexer) {
     if (indent_token.type != TOKEN_NULL) {
         return indent_token;
     }
-    
+
     // Verificar si hay tokens pendientes de indentación
     if (lexer->pending != 0) {
         return get_pending_indentation_token(lexer);
     }
 
     // Si estamos al final del archivo y aún hay indentación pendiente
-    if (is_at_end(lexer) && lexer->indent > 0) {
-        lexer->indent--;
+    if (is_at_end(lexer) && lexer->indent_top > 0) {
+        lexer->indent_top--;
         lexer->pending = -1;
+        
         return get_pending_indentation_token(lexer);
     }
 
@@ -479,31 +512,16 @@ Token Lexer_next_token(Lexer* lexer) {
     // El resto del código original...
     char c = advance(lexer);
     
-    // Nueva línea
-    if (is_newline(c)) {
-        Token token;
-    
-        if (lexer->parent_level > 0 || !lexer->saw_token) {
-            token = make_token(lexer, TOKEN_NL);
-        } else {
-            token = make_token(lexer, TOKEN_NEWLINE);
-        }
-    
-        lexer->saw_token = false;
-        lexer->atbol = true;
-        
-        return token;
-    }
-    
     // EOF
     if (is_eof(c)) {
-        if (lexer->parent_level > 0) {
-            return error_token(lexer, "ERROR: Parentesis no cerrado al final del archivo.");
-        }
-
         return eof(lexer);
     }
-    
+
+    // Nueva línea
+    if (is_newline(c)) {
+        return newline(lexer);
+    }
+
     // Comentario
     if (is_hash(c)) {
         return comment(lexer);
@@ -511,7 +529,7 @@ Token Lexer_next_token(Lexer* lexer) {
 
     // Identificador o palabra clave
     if (is_alpha(c)) {
-        return identifier(lexer);
+        return identifier_or_keyword(lexer);
     }
 
     // Numero
@@ -524,9 +542,13 @@ Token Lexer_next_token(Lexer* lexer) {
         return string(lexer);
     }
 
+    // Delimitadores
+    if (is_delimiter(c)) {
+        return delimiter(lexer, c);
+    }
+
     // Tokens de uno o dos caracteres
     switch (c) {
-        // Token de un caracter
         case '+': 
             return make_token(lexer, TOKEN_PLUS);
         case '-': 
@@ -537,39 +559,12 @@ Token Lexer_next_token(Lexer* lexer) {
             return make_token(lexer, TOKEN_SLASH);
         case '%': 
             return make_token(lexer, TOKEN_PERCENT);
-
-        // Delimitadores de apertura
-        case '(':
-        case '[':
-        case '{':
-            push_parent(lexer, c);
-
-            return make_token(lexer,
-                c == '(' ? TOKEN_LEFT_PARENTHESIS :
-                c == '[' ? TOKEN_LEFT_BRACKET :
-                            TOKEN_LEFT_BRACE);
-        
-        // Delimitadores de cierre
-        case ')':
-        case ']':
-        case '}':
-            if (!pop_paren(lexer, c)) {
-                return error_token(lexer, "ERROR: Parentesis de cierre inesperado o no coincide.");
-            }
-
-            return make_token(lexer,
-                c == ')' ? TOKEN_RIGHT_PARENTHESIS :
-                c == ']' ? TOKEN_RIGHT_BRACKET :
-                            TOKEN_RIGHT_BRACE);
-        
         case ',': 
             return make_token(lexer, TOKEN_COMMA);
         case '.': 
             return make_token(lexer, TOKEN_DOT);
         case ':': 
             return make_token(lexer, TOKEN_COLON);
-
-        // Token de dos caracteres
         case '=': 
             return make_token(lexer, match(lexer, '=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
         case '!': 
