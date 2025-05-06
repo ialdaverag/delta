@@ -614,8 +614,29 @@ static void test_Lexer_next_token_whitespace(void) {
 static void test_Lexer_next_token_newline(void) {
     {
         Lexer lexer;
+        Lexer_init(&lexer, ":\n");
+
+        // :
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_COLON, token.type);
+        TEST_ASSERT_EQUAL_STRING(":", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+
+        // \n
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_NEWLINE, token.type);
+        TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(2, token.column);
+        Token_free(&token);
+    }
+    {
+        Lexer lexer;
         Lexer_init(&lexer, "\n");
 
+        // \n
         Token token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_NL, token.type);
         TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
@@ -627,6 +648,7 @@ static void test_Lexer_next_token_newline(void) {
         Lexer lexer;
         Lexer_init(&lexer, "\r\n");
 
+        // \r\n
         Token token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_NL, token.type);
         TEST_ASSERT_EQUAL_STRING("\r\n", token.lexeme);
@@ -636,238 +658,187 @@ static void test_Lexer_next_token_newline(void) {
     }
 }
 
-static void test_Lexer_next_token_one_char_token(void) {
+static void test_Lexer_next_token_comment() {
     {
         Lexer lexer;
-        Lexer_init(&lexer, "+");
-
+        Lexer_init(&lexer, "#");
+        
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_PLUS, token.type);
-        TEST_ASSERT_EQUAL_STRING("+", token.lexeme);
+        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
+        TEST_ASSERT_EQUAL_STRING("#", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
     }
     {
         Lexer lexer;
-        Lexer_init(&lexer, "-");
-
+        Lexer_init(&lexer, "#Comentario sin nueva línea");
+        
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_MINUS, token.type);
-        TEST_ASSERT_EQUAL_STRING("-", token.lexeme);
+        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
+        TEST_ASSERT_EQUAL_STRING("#Comentario sin nueva línea", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
     }
     {
         Lexer lexer;
-        Lexer_init(&lexer, "*");
-
+        Lexer_init(&lexer, "   # Comentario con espacios antes");
+        
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_STAR, token.type);
-        TEST_ASSERT_EQUAL_STRING("*", token.lexeme);
+        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
+        TEST_ASSERT_EQUAL_STRING("# Comentario con espacios antes", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(4, token.column); // Los 3 espacios + 1 para el #
+        Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "# !@#$%^&*()_+-=[]{}\\|;:'\",.<>/?");
+        
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
+        TEST_ASSERT_EQUAL_STRING("# !@#$%^&*()_+-=[]{}\\|;:'\",.<>/?", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
     }
     {
         Lexer lexer;
-        Lexer_init(&lexer, "/");
+        Lexer_init(&lexer, "#Primer comentario\n#Segundo comentario\n#Tercer comentario");
 
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_SLASH, token.type);
-        TEST_ASSERT_EQUAL_STRING("/", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
-        Token_free(&token);
-    }
-    {
-        Lexer lexer;
-        Lexer_init(&lexer, "%");
-
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_PERCENT, token.type);
-        TEST_ASSERT_EQUAL_STRING("%", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
-        Token_free(&token);
-    }
-    {
-        Lexer lexer;
-        Lexer_init(&lexer, "()");
-
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_LEFT_PARENTHESIS, token.type);
-        TEST_ASSERT_EQUAL_STRING("(", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
-        Token_free(&token);
-
+        Token token;
+        
+        // Primer comentario
         token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_RIGHT_PARENTHESIS, token.type);
-        TEST_ASSERT_EQUAL_STRING(")", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(2, token.column);
-        Token_free(&token);
-    }
-    {
-        Lexer lexer;
-        Lexer_init(&lexer, "[]");
-
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_LEFT_BRACKET, token.type);
-        TEST_ASSERT_EQUAL_STRING("[", token.lexeme);
+        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
+        TEST_ASSERT_EQUAL_STRING("#Primer comentario", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
 
+        TEST_ASSERT_EQUAL_STRING("#Primer comentario\n#Segundo comentario\n#Tercer comentario", lexer.start);
+        TEST_ASSERT_EQUAL_STRING("\n#Segundo comentario\n#Tercer comentario", lexer.current);
+        TEST_ASSERT_EQUAL_INT(1, lexer.line);
+        TEST_ASSERT_EQUAL_INT(19, lexer.column); // 19 caracteres + 1 para el #
+
+        // Nueva línea (primer comentario)
         token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_RIGHT_BRACKET, token.type);
-        TEST_ASSERT_EQUAL_STRING("]", token.lexeme);
+        TEST_ASSERT_EQUAL(TOKEN_NL, token.type);
+        TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(2, token.column);
-        Token_free(&token);
-    }
-    {
-        Lexer lexer;
-        Lexer_init(&lexer, "{}");
-
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_LEFT_BRACE, token.type);
-        TEST_ASSERT_EQUAL_STRING("{", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
+        TEST_ASSERT_EQUAL_INT(19, token.column);
         Token_free(&token);
 
+        TEST_ASSERT_EQUAL_STRING("\n#Segundo comentario\n#Tercer comentario", lexer.start);
+        TEST_ASSERT_EQUAL_STRING("#Segundo comentario\n#Tercer comentario", lexer.current);
+        TEST_ASSERT_EQUAL_INT(2, lexer.line);
+        TEST_ASSERT_EQUAL_INT(1, lexer.column); // 1 para el #
+        
+        // Segundo comentario
         token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_RIGHT_BRACE, token.type);
-        TEST_ASSERT_EQUAL_STRING("}", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(2, token.column);
+        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
+        TEST_ASSERT_EQUAL_STRING("#Segundo comentario", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(2, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
+
+        TEST_ASSERT_EQUAL_STRING("#Segundo comentario\n#Tercer comentario", lexer.start);
+        TEST_ASSERT_EQUAL_STRING("\n#Tercer comentario", lexer.current);
+        TEST_ASSERT_EQUAL_INT(2, lexer.line);
+        TEST_ASSERT_EQUAL_INT(20, lexer.column); // 18 caracteres + 1 para el #
+
+        // Nueva línea (segundo comentario)
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_NL, token.type);
+        TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(2, token.line);
+        TEST_ASSERT_EQUAL_INT(20, token.column);
+        Token_free(&token);
+
+        TEST_ASSERT_EQUAL_STRING("\n#Tercer comentario", lexer.start);
+        TEST_ASSERT_EQUAL_STRING("#Tercer comentario", lexer.current);
+        TEST_ASSERT_EQUAL_INT(3, lexer.line);
+        TEST_ASSERT_EQUAL_INT(1, lexer.column); // 1 para el #
+        
+        // Tercer comentario
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
+        TEST_ASSERT_EQUAL_STRING("#Tercer comentario", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(3, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+
+        TEST_ASSERT_EQUAL_STRING("#Tercer comentario", lexer.start);
+        TEST_ASSERT_EQUAL_STRING("", lexer.current);
+        TEST_ASSERT_EQUAL_INT(3, lexer.line);
+        TEST_ASSERT_EQUAL_INT(19, lexer.column); // 17 caracteres + 1 para el #
+        
+        // EOF
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_EOF, token.type);
+        TEST_ASSERT_EQUAL_STRING("", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(3, token.line);
+        TEST_ASSERT_EQUAL_INT(19, token.column);
+        Token_free(&token);
+
+        TEST_ASSERT_EQUAL_STRING("", lexer.start);
+        TEST_ASSERT_EQUAL_STRING("#Primer comentario", lexer.current);
+        TEST_ASSERT_EQUAL_INT(3, lexer.line);
+        TEST_ASSERT_EQUAL_INT(20, lexer.column); // 19 caracteres + 1 para el # (del último comentario)
     }
     {
         Lexer lexer;
-        Lexer_init(&lexer, ",");
+        Lexer_init(&lexer, "var x = 10 # Esto es un comentario");
 
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_COMMA, token.type);
-        TEST_ASSERT_EQUAL_STRING(",", token.lexeme);
+        Token token;
+
+        // var
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_VAR, token.type);
+        TEST_ASSERT_EQUAL_STRING("var", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
-    }
-    {
-        Lexer lexer;
-        Lexer_init(&lexer, ".");
 
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_DOT, token.type);
-        TEST_ASSERT_EQUAL_STRING(".", token.lexeme);
+        // x
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_IDENTIFIER, token.type);
+        TEST_ASSERT_EQUAL_STRING("x", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
+        TEST_ASSERT_EQUAL_INT(5, token.column);
         Token_free(&token);
-    }
-    {
-        Lexer lexer;
-        Lexer_init(&lexer, ":");
 
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_COLON, token.type);
-        TEST_ASSERT_EQUAL_STRING(":", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
-        Token_free(&token);
-    }
-}
-
-static void test_Lexer_next_token_one_or_two_chars_token(void) {
-    {
-        Lexer lexer;
-        Lexer_init(&lexer, "=");
-
-        Token token = Lexer_next_token(&lexer);
+        // =
+        token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_EQUAL, token.type);
         TEST_ASSERT_EQUAL_STRING("=", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
+        TEST_ASSERT_EQUAL_INT(7, token.column);
         Token_free(&token);
-    }
-    {
-        Lexer lexer;
-        Lexer_init(&lexer, "==");
 
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_EQUAL_EQUAL, token.type);
-        TEST_ASSERT_EQUAL_STRING("==", token.lexeme);
+        // 10
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_INTEGER, token.type);
+        TEST_ASSERT_EQUAL_STRING("10", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
+        TEST_ASSERT_EQUAL_INT(9, token.column);
         Token_free(&token);
-    }
-    {
-        Lexer lexer;
-        Lexer_init(&lexer, "!");
 
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_ERROR, token.type);
-        TEST_ASSERT_EQUAL_STRING("!", token.lexeme);
+        // # Esto es un comentario
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
+        TEST_ASSERT_EQUAL_STRING("# Esto es un comentario", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
+        TEST_ASSERT_EQUAL_INT(12, token.column);
         Token_free(&token);
-    }
-    {
-        Lexer lexer;
-        Lexer_init(&lexer, "!=");
 
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_BANG_EQUAL, token.type);
-        TEST_ASSERT_EQUAL_STRING("!=", token.lexeme);
+        // EOF
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_EOF, token.type);
+        TEST_ASSERT_EQUAL_STRING("", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
-        Token_free(&token);
-    }
-    {
-        Lexer lexer;
-        Lexer_init(&lexer, "<");
-
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_LESS, token.type);
-        TEST_ASSERT_EQUAL_STRING("<", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
-        Token_free(&token);
-    }
-    {
-        Lexer lexer;
-        Lexer_init(&lexer, "<=");
-
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_LESS_EQUAL, token.type);
-        TEST_ASSERT_EQUAL_STRING("<=", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
-        Token_free(&token);
-    }
-    {
-        Lexer lexer;
-        Lexer_init(&lexer, ">");
-
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_GREATER, token.type);
-        TEST_ASSERT_EQUAL_STRING(">", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
-        Token_free(&token);
-    }
-    {
-        Lexer lexer;
-        Lexer_init(&lexer, ">=");
-
-        Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_GREATER_EQUAL, token.type);
-        TEST_ASSERT_EQUAL_STRING(">=", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
+        TEST_ASSERT_EQUAL_INT(35, token.column);
         Token_free(&token);
     }
 }
@@ -1319,187 +1290,266 @@ static void test_Lexer_next_token_string(void) {
     }
 }
 
-static void test_Lexer_next_token_comment() {
+static void test_Lexer_next_token_delimiters(void) {
     {
         Lexer lexer;
-        Lexer_init(&lexer, "#");
-        
+        Lexer_init(&lexer, "()");
+
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
-        TEST_ASSERT_EQUAL_STRING("#", token.lexeme);
+        TEST_ASSERT_EQUAL(TOKEN_LEFT_PARENTHESIS, token.type);
+        TEST_ASSERT_EQUAL_STRING("(", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_RIGHT_PARENTHESIS, token.type);
+        TEST_ASSERT_EQUAL_STRING(")", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(2, token.column);
         Token_free(&token);
     }
     {
         Lexer lexer;
-        Lexer_init(&lexer, "#Comentario sin nueva línea");
-        
+        Lexer_init(&lexer, "[]");
+
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
-        TEST_ASSERT_EQUAL_STRING("#Comentario sin nueva línea", token.lexeme);
+        TEST_ASSERT_EQUAL(TOKEN_LEFT_BRACKET, token.type);
+        TEST_ASSERT_EQUAL_STRING("[", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_RIGHT_BRACKET, token.type);
+        TEST_ASSERT_EQUAL_STRING("]", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(2, token.column);
         Token_free(&token);
     }
     {
         Lexer lexer;
-        Lexer_init(&lexer, "   # Comentario con espacios antes");
-        
+        Lexer_init(&lexer, "{}");
+
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
-        TEST_ASSERT_EQUAL_STRING("# Comentario con espacios antes", token.lexeme);
+        TEST_ASSERT_EQUAL(TOKEN_LEFT_BRACE, token.type);
+        TEST_ASSERT_EQUAL_STRING("{", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(4, token.column); // Los 3 espacios + 1 para el #
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+
+        token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_RIGHT_BRACE, token.type);
+        TEST_ASSERT_EQUAL_STRING("}", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(2, token.column);
         Token_free(&token);
     }
+}
+
+static void test_Lexer_next_token_one_char_token(void) {
     {
         Lexer lexer;
-        Lexer_init(&lexer, "# !@#$%^&*()_+-=[]{}\\|;:'\",.<>/?");
-        
+        Lexer_init(&lexer, "+");
+
         Token token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
-        TEST_ASSERT_EQUAL_STRING("# !@#$%^&*()_+-=[]{}\\|;:'\",.<>/?", token.lexeme);
+        TEST_ASSERT_EQUAL(TOKEN_PLUS, token.type);
+        TEST_ASSERT_EQUAL_STRING("+", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
     }
     {
         Lexer lexer;
-        Lexer_init(&lexer, "#Primer comentario\n#Segundo comentario\n#Tercer comentario");
+        Lexer_init(&lexer, "-");
 
-        Token token;
-        
-        // Primer comentario
-        token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
-        TEST_ASSERT_EQUAL_STRING("#Primer comentario", token.lexeme);
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_MINUS, token.type);
+        TEST_ASSERT_EQUAL_STRING("-", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
-
-        TEST_ASSERT_EQUAL_STRING("#Primer comentario\n#Segundo comentario\n#Tercer comentario", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("\n#Segundo comentario\n#Tercer comentario", lexer.current);
-        TEST_ASSERT_EQUAL_INT(1, lexer.line);
-        TEST_ASSERT_EQUAL_INT(19, lexer.column); // 19 caracteres + 1 para el #
-
-        // Nueva línea (primer comentario)
-        token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_NL, token.type);
-        TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(19, token.column);
-        Token_free(&token);
-
-        TEST_ASSERT_EQUAL_STRING("\n#Segundo comentario\n#Tercer comentario", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("#Segundo comentario\n#Tercer comentario", lexer.current);
-        TEST_ASSERT_EQUAL_INT(2, lexer.line);
-        TEST_ASSERT_EQUAL_INT(1, lexer.column); // 1 para el #
-        
-        // Segundo comentario
-        token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
-        TEST_ASSERT_EQUAL_STRING("#Segundo comentario", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(2, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
-        Token_free(&token);
-
-        TEST_ASSERT_EQUAL_STRING("#Segundo comentario\n#Tercer comentario", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("\n#Tercer comentario", lexer.current);
-        TEST_ASSERT_EQUAL_INT(2, lexer.line);
-        TEST_ASSERT_EQUAL_INT(20, lexer.column); // 18 caracteres + 1 para el #
-
-        // Nueva línea (segundo comentario)
-        token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_NL, token.type);
-        TEST_ASSERT_EQUAL_STRING("\n", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(2, token.line);
-        TEST_ASSERT_EQUAL_INT(20, token.column);
-        Token_free(&token);
-
-        TEST_ASSERT_EQUAL_STRING("\n#Tercer comentario", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("#Tercer comentario", lexer.current);
-        TEST_ASSERT_EQUAL_INT(3, lexer.line);
-        TEST_ASSERT_EQUAL_INT(1, lexer.column); // 1 para el #
-        
-        // Tercer comentario
-        token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
-        TEST_ASSERT_EQUAL_STRING("#Tercer comentario", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(3, token.line);
-        TEST_ASSERT_EQUAL_INT(1, token.column);
-        Token_free(&token);
-
-        TEST_ASSERT_EQUAL_STRING("#Tercer comentario", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("", lexer.current);
-        TEST_ASSERT_EQUAL_INT(3, lexer.line);
-        TEST_ASSERT_EQUAL_INT(19, lexer.column); // 17 caracteres + 1 para el #
-        
-        // EOF
-        token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_EOF, token.type);
-        TEST_ASSERT_EQUAL_STRING("", token.lexeme);
-        TEST_ASSERT_EQUAL_INT(3, token.line);
-        TEST_ASSERT_EQUAL_INT(19, token.column);
-        Token_free(&token);
-
-        TEST_ASSERT_EQUAL_STRING("", lexer.start);
-        TEST_ASSERT_EQUAL_STRING("#Primer comentario", lexer.current);
-        TEST_ASSERT_EQUAL_INT(3, lexer.line);
-        TEST_ASSERT_EQUAL_INT(20, lexer.column); // 19 caracteres + 1 para el # (del último comentario)
     }
     {
         Lexer lexer;
-        Lexer_init(&lexer, "var x = 10 # Esto es un comentario");
+        Lexer_init(&lexer, "*");
 
-        Token token;
-
-        // var
-        token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_VAR, token.type);
-        TEST_ASSERT_EQUAL_STRING("var", token.lexeme);
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_STAR, token.type);
+        TEST_ASSERT_EQUAL_STRING("*", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
         TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "/");
 
-        // x
-        token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_IDENTIFIER, token.type);
-        TEST_ASSERT_EQUAL_STRING("x", token.lexeme);
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_SLASH, token.type);
+        TEST_ASSERT_EQUAL_STRING("/", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(5, token.column);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "%");
 
-        // =
-        token = Lexer_next_token(&lexer);
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_PERCENT, token.type);
+        TEST_ASSERT_EQUAL_STRING("%", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, ",");
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_COMMA, token.type);
+        TEST_ASSERT_EQUAL_STRING(",", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, ".");
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_DOT, token.type);
+        TEST_ASSERT_EQUAL_STRING(".", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, ";");
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_SEMICOLON, token.type);
+        TEST_ASSERT_EQUAL_STRING(";", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, ":");
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_COLON, token.type);
+        TEST_ASSERT_EQUAL_STRING(":", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "=");
+
+        Token token = Lexer_next_token(&lexer);
         TEST_ASSERT_EQUAL(TOKEN_EQUAL, token.type);
         TEST_ASSERT_EQUAL_STRING("=", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(7, token.column);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
-
-        // 10
-        token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_INTEGER, token.type);
-        TEST_ASSERT_EQUAL_STRING("10", token.lexeme);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "!");
+        
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_BANG, token.type);
+        TEST_ASSERT_EQUAL_STRING("!", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(9, token.column);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "<");
 
-        // # Esto es un comentario
-        token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_COMMENT, token.type);
-        TEST_ASSERT_EQUAL_STRING("# Esto es un comentario", token.lexeme);
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_LESS, token.type);
+        TEST_ASSERT_EQUAL_STRING("<", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(12, token.column);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, ">");
 
-        // EOF
-        token = Lexer_next_token(&lexer);
-        TEST_ASSERT_EQUAL(TOKEN_EOF, token.type);
-        TEST_ASSERT_EQUAL_STRING("", token.lexeme);
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_GREATER, token.type);
+        TEST_ASSERT_EQUAL_STRING(">", token.lexeme);
         TEST_ASSERT_EQUAL_INT(1, token.line);
-        TEST_ASSERT_EQUAL_INT(35, token.column);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+}
+
+static void test_Lexer_next_token_two_chars_token(void) {
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "==");
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_EQUAL_EQUAL, token.type);
+        TEST_ASSERT_EQUAL_STRING("==", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "!=");
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_BANG_EQUAL, token.type);
+        TEST_ASSERT_EQUAL_STRING("!=", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "<=");
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_LESS_EQUAL, token.type);
+        TEST_ASSERT_EQUAL_STRING("<=", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, ">=");
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_GREATER_EQUAL, token.type);
+        TEST_ASSERT_EQUAL_STRING(">=", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
+        Token_free(&token);
+    }
+}
+
+static void test_Lexer_next_token_three_chars_token(void) {
+    {
+        Lexer lexer;
+        Lexer_init(&lexer, "...");
+
+        Token token = Lexer_next_token(&lexer);
+        TEST_ASSERT_EQUAL(TOKEN_ELLIPSIS, token.type);
+        TEST_ASSERT_EQUAL_STRING("...", token.lexeme);
+        TEST_ASSERT_EQUAL_INT(1, token.line);
+        TEST_ASSERT_EQUAL_INT(1, token.column);
         Token_free(&token);
     }
 }
@@ -1511,11 +1561,13 @@ void test_Lexer_next_token(void) {
     test_Lexer_next_token_EOF();
     test_Lexer_next_token_whitespace();
     test_Lexer_next_token_newline();
-    test_Lexer_next_token_one_char_token();
-    test_Lexer_next_token_one_or_two_chars_token();
+    test_Lexer_next_token_comment();
     test_Lexer_next_token_identifier();
     test_Lexer_next_token_keyword();
     test_Lexer_next_token_number();
     test_Lexer_next_token_string();
-    test_Lexer_next_token_comment();
+    test_Lexer_next_token_delimiters();
+    test_Lexer_next_token_one_char_token();
+    test_Lexer_next_token_two_chars_token();
+    test_Lexer_next_token_three_chars_token();
 }

@@ -59,6 +59,8 @@ static const char* token_type_to_string(TokenType type) {
             return "STRING";
 
         // Operadores
+        case TOKEN_BANG: 
+            return "BANG";
         case TOKEN_EQUAL: 
             return "EQUAL";
         case TOKEN_PLUS: 
@@ -84,6 +86,9 @@ static const char* token_type_to_string(TokenType type) {
         case TOKEN_GREATER_EQUAL: 
             return "GREATER_EQUAL";
 
+        case TOKEN_ELLIPSIS:
+            return "ELLIPSIS";
+
         // Delimitadores
         case TOKEN_LEFT_PARENTHESIS: 
             return "LEFT_PARENTHESIS";
@@ -103,6 +108,8 @@ static const char* token_type_to_string(TokenType type) {
             return "DOT";
         case TOKEN_COLON: 
             return "COLON";
+        case TOKEN_SEMICOLON:
+            return "SEMICOLON";
 
         // Comentario
         case TOKEN_COMMENT: 

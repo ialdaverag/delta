@@ -43,6 +43,7 @@ typedef enum {
     TOKEN_SLASH, // /
     TOKEN_PERCENT, // %
 
+    TOKEN_BANG, // !
     TOKEN_EQUAL_EQUAL, // ==
     TOKEN_BANG_EQUAL, // !=
     TOKEN_LESS, // <
@@ -60,6 +61,9 @@ typedef enum {
     TOKEN_COMMA, // ,
     TOKEN_DOT, // .
     TOKEN_COLON, // :
+    TOKEN_SEMICOLON, // ;
+
+    TOKEN_ELLIPSIS, // ...
 
     // Comentario
     TOKEN_COMMENT, // #.*
