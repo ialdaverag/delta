@@ -1,6 +1,4 @@
 #include "token.h"
-#include <stdlib.h>
-#include <string.h>
 
 static const char* token_type_to_string(TokenType type) {
     switch (type) {

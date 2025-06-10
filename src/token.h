@@ -1,9 +1,26 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
+#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 
 typedef enum {
+    // Fin de archivo
+    TOKEN_EOF, // \0
+
+    // Nueva línea
+    TOKEN_NEWLINE, // \n
+    TOKEN_NL, // \n
+
+    // Identación
+    TOKEN_INDENT,
+    TOKEN_DEDENT,
+    TOKEN_NULL,
+
+    // Comentario
+    TOKEN_COMMENT, // #.*
+
     // Palabras clave
     TOKEN_VAR, // var
     TOKEN_CONST, // const
@@ -34,24 +51,16 @@ typedef enum {
     TOKEN_FLOAT, // [0-9]+.[0-9]+
     TOKEN_STRING, // ".*" o '.*'
 
-    // Operadores
-    TOKEN_EQUAL, // =
-
+    // Tokens de un caracter
     TOKEN_PLUS, // +
     TOKEN_MINUS, // -
     TOKEN_STAR, // *
     TOKEN_SLASH, // /
     TOKEN_PERCENT, // %
-
     TOKEN_BANG, // !
-    TOKEN_EQUAL_EQUAL, // ==
-    TOKEN_BANG_EQUAL, // !=
+    TOKEN_EQUAL, // =
     TOKEN_LESS, // <
-    TOKEN_LESS_EQUAL, // <=
     TOKEN_GREATER, // >
-    TOKEN_GREATER_EQUAL, // >=
-
-    // Delimitadores
     TOKEN_LEFT_PARENTHESIS, // (
     TOKEN_LEFT_BRACKET, // [
     TOKEN_LEFT_BRACE, // {
@@ -63,25 +72,20 @@ typedef enum {
     TOKEN_COLON, // :
     TOKEN_SEMICOLON, // ;
 
+    // Tokens de dos caracteres
+    TOKEN_EQUAL_EQUAL, // ==
+    TOKEN_BANG_EQUAL, // !=
+    TOKEN_LESS_EQUAL, // <=
+    TOKEN_GREATER_EQUAL, // >=
+
+    // Tokens de tres caracteres
     TOKEN_ELLIPSIS, // ...
 
-    // Comentario
-    TOKEN_COMMENT, // #.*
-
-    // Nueva línea
-    TOKEN_NEWLINE, // \n
-    TOKEN_NL, // \n
-
-    // Identación
-    TOKEN_INDENT,
-    TOKEN_DEDENT,
-    TOKEN_NULL,
+    // Desconocido
+    TOKEN_UNKNOWN,
 
     // Error
     TOKEN_ERROR, // Error de análisis
-
-    // Fin de archivo
-    TOKEN_EOF, // \0
 } TokenType;
 
 typedef struct Token {

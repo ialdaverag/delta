@@ -11,21 +11,28 @@
 #define TAB_SIZE 4
 
 typedef struct {
+    // Inicio y fin del texto fuente
     const char* start;
     const char* current;
+
+    // Línea y columna del texto fuente
     int line;
     int column;
 
+    // Línea y columna del token actual	
     int token_line;
     int token_column;
 
+    // Token significativo
     bool saw_token;
 
+    // Indentación
     int indent_stack[MAX_INDENT_STACK];
     int indent_top;
     int pending;
     bool atbol;
 
+    // Delimitadores
     int parent_stack[MAX_PARENT_STACK];
     int parent_top;
     int parent_line_stack[MAX_PARENT_STACK];
