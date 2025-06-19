@@ -19,24 +19,24 @@ El lexer ya es capaz de identificar:
 
 - `var`
 - `const`
+- `nulo`
+- `falso`
+- `verdadero`
+- `no`
+- `y`
+- `o`
 - `si`
 - `sino`
 - `segun`
 - `caso`
 - `otro`
-- `clase`
+- `mientras`
+- `para`
+- `romper`
 - `continuar`
 - `fun`
-- `falso`
-- `mientras`
-- `no`
-- `nulo`
-- `o`
-- `para`
 - `ret`
-- `romper`
-- `verdadero`
-- `y`
+- `clase`
 
 ### 🔢 Literales numéricos
 
